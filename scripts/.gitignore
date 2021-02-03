@@ -1,0 +1,5 @@
+*test.py
+functions/__pycache__/*
+includes/__pycache__/*
+includes/installdb.py
+includes/modsdb.py
