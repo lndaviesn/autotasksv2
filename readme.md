@@ -93,3 +93,10 @@ This script can be used for testing some thing things being missed out
 * Checking All plugins are correct
 * Environment settings are correct
 * Checking Security Settings
+
+
+### regenzip.py
+This script remakes the packed up zip file from the data pulled from lmsupgradeprep
+
+### lmslogin.py
+using the login info from the config file it logs you in to the LMS
