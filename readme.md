@@ -94,7 +94,6 @@ This script can be used for testing some thing things being missed out
 * Environment settings are correct
 * Checking Security Settings
 
-
 ### regenzip.py
 This script remakes the packed up zip file from the data pulled from lmsupgradeprep
 
