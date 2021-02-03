@@ -1,0 +1,9 @@
+##this information contains sentive info so 
+users=[
+{'first': '<firstname>', 'last': '<lastname>', 'username': '<username>','email':'<email>','admin':'true/false'}
+]
+
+serversets=[
+{'server': '<servername>', 'clamavpath':'<pathtoclamdscan>','clamavsocket':'<pathtoclamsocket>'}
+
+]

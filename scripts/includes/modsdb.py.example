@@ -1,0 +1,4 @@
+lms_mods_store_path = ""
+repos=[
+    {"domain":"","repo":"","branch":"main"},
+]
