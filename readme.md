@@ -56,9 +56,9 @@ When the current-lms is pulled down, it Will
 * Pull mods, if not in store repo
 * Install mods, from repo
 * Create packages up new LMS zip file
+* pulls upgradekey form config file
 
-### lmsupgradedo.py
-to be done soon
+
 
 ### lmsinstallprep.py
 This script preps the install package ready for deployment
