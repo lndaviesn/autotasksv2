@@ -46,7 +46,6 @@ def pull(lmsdata):
                 print ("Pull done")
                 modfound = True
 
-
     #If not found in the modsdb.repo arrey checks if the domain found in frompath
     if (os.path.exists(frompath) is False and modfound is False):
         ##If not then pull then from current LMS files
@@ -61,7 +60,7 @@ def pull(lmsdata):
         copyDirectory(currenttheme,tmpthemepath)
         #remove all files aprt
         themlist = os.listdir(tmpthemepath)
-        tokeep = ['config.php','pix','style']
+        tokeep = ['config.php','pix','style','java','javascript']
         for item in themlist:
             if item in tokeep:
                 print ("Found not removeing")
