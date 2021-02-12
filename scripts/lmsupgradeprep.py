@@ -27,6 +27,20 @@ def createdir(folder):
         print ("Creation of the directory failed")
     else:
         print ("Successfully created the directory")
+def gitclear(folderrp):
+    gitlist = ['.git','.gitignore']
+    for gitfold in gitlist:
+        print (gitfold)
+        for name in glob.glob(folderrp + "/"+gitfold):
+            if os.path.isdir(name) == True:
+                print ("!!removed folder!!")
+                print (name)
+                shutil.rmtree(name)
+            if os.path.isfile(name) == True:
+                print ("!!It be an file!!")
+                os.remove(name)
+
+
 
 
 ##########################################
@@ -139,8 +153,12 @@ repofolder = lmsdata["newlmspath"]
 print ("Getting corelms using Git")
 with Git().custom_environment(GIT_SSH_COMMAND=git_ssh_cmd):
     gitrepo = Repo.clone_from(lmsdata["gitrepo"], repofolder, branch=repotag)
+print ("Removing git folder")
+gitclear(repofolder)
+
 
 print ("Generating ZIP file")
+
 ##Build zip file
 #!for record need to do this way to by pass the issue of not being able to over wtire folders
 #make version folder
@@ -159,12 +177,7 @@ zipcmd = 'zip -qr ' + zipname + ' ' + lmsfodname
 print("Applying LMS core")
 ##Copy corelms to folder
 copyDirectory(lmsdata["newlmspath"],lmsfodpath)
-for name in glob.glob(lmsfodpath + "/.git"):
-    if os.path.isdir(name) == True:
-        print ("removed folder")
-        shutil.rmtree(lmsfodpath + "/.git")
-    if os.path.isfile(name) == True:
-        print ("It be an file")
+gitclear(lmsfodpath)
 
 copyDirectory(lmsdata["newlmspath"], lmsdata["uplmsfolder"] + "/totara")
 
@@ -172,28 +185,25 @@ if os.path.exists(lmsdata["pluginspath"]):
     #Copy plugins to folder
     print("Applying LMS plugins")
     copyDirectory(lmsdata["pluginspath"],lmsfodpath)
-    for name in glob.glob(lmsfodpath + "/.git"):
-        if os.path.isdir(name) == True:
-            print ("removed folder")
-            shutil.rmtree(lmsfodpath + "/.git")
-        if os.path.isfile(name) == True:
-            print ("It be an file")
+    gitclear(lmsfodpath)
+
     copyDirectory(lmsdata["pluginspath"], lmsdata["uplmsfolder"] + "/plugins")
 
 if os.path.exists(lmsdata["modspath"]):
     ##Copy mods to folder
     print("Applying LMS mods")
     copyDirectory(lmsdata["modspath"],lmsfodpath)
-    for name in glob.glob(lmsfodpath + "/.git"):
-        if os.path.isdir(name) == True:
-            print ("removed folder")
-            shutil.rmtree(lmsfodpath + "/.git")
-        if os.path.isfile(name) == True:
-            print ("It be an file")
+    gitclear(lmsfodpath)
     copyDirectory(lmsdata["modspath"], lmsdata["uplmsfolder"] + "/mods")
 
 
 shutil.copy2(lmsdata["currentlmspath"] + "/config.php",lmsdata["uplmsfolder"]+"/config.php")
+persmods_folder ="for i in $(find . -type d); do chmod 0755 $i; done"
+os.system(persmods_folder)
+persmods_file ="for i in $(find . -type f); do chmod 0644 $i; done"
+os.system(persmods_file)
+
+
 os.system(zipcmd)
 shutil.copyfile(zipname,lmsdata["uplmsfolder"]+zipname)
 
