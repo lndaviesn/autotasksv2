@@ -1,9 +1,9 @@
+#!/usr/bin/env python
 from selenium import webdriver
-from time import sleep
-from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.webdriver.common.keys import Keys
+from time import sleep
 import re
 import string
 import random
@@ -14,7 +14,14 @@ import os
 ##Loads the webpage
 def webb(addr,min):
     global browser
-    browser = webdriver.Firefox()
+    profile = webdriver.FirefoxProfile()
+    profile.set_preference("browser.download.folderList", 2)
+    profile.set_preference("browser.download.manager.showWhenStarting", False)
+    profile.set_preference("browser.helperApps.neverAsk.saveToDisk","text/csv")
+    profile.set_preference("browser.download.panel.shown", False)
+    profile.set_preference("browser.helperApps.alwaysAsk.force", False)
+    profile.set_preference("browser.download.dir", "/tmp/")
+    browser = webdriver.Firefox(firefox_profile=profile)
     browser.get(addr+"/?saml=off")
     if (min == True):
         browser.minimize_window()
@@ -161,18 +168,109 @@ def check_security(lms_site):
         else:
             sleep(2)
             check_loop = check_loop + 1
-
-
-
-
-
-
-
 #LMS mods
+##Get_reports
+def get_reports(lms_site,dpath):
+    rport_lists = []
+    browser.get("about:config")
+    browser.find_element_by_xpath('//*[@id="warningButton"]').click()
+    browser_ui_search = browser.find_element_by_xpath('//*[@id="about-config-search"]')
+    browser_ui_search.clear()
+    browser_ui_search.send_keys("browser.download.dir")
+    sleep(4)
+    browser.find_element_by_xpath('//*[@data-l10n-id="about-config-pref-edit-button"]').click()
+    sleep(4)
+    browser_ui_mod_text = browser.find_element_by_xpath('//*[@id="prefs"]/tr[@class="has-user-value "]/td[@class="cell-value"]/form[@id="form-edit"]/input[@type="text"]')
+    browser_ui_mod_text.clear()
+    browser_ui_mod_text.send_keys(dpath)
+    browser.find_element_by_xpath('//*[@id="prefs"]/tr[@class="has-user-value "]/td[@class="cell-edit"]/button[@title="Save"]').click()
+    sleep(4)
+    browser.get(lms_site+'/totara/reportbuilder/index.php')
+    #https://wshelearn.learningnexus.co.uk/totara/reportbuilder/report.php?id=67
+    check_loop = 0
+    while( check_loop<70):
+        ##For totara 10 and + i hope
+        if (re.search('<h2>Manage user reports</h2>', browser.page_source)):
+            print("Totara 10 +")
+            print ("Searching Table")
+            table_body = browser.find_element_by_xpath('//*[@id="manage_user_reports"]/tbody')
+            table_trs = table_body.find_elements_by_tag_name("tr")
+            for trs in table_trs:
+                tdinfo = []
+                tdinf = trs.find_element_by_xpath('td[@class="cell c0 report_namelinkeditview"]')
+                tdinfo.append(tdinf.get_attribute('innerHTML'))
+                url = re.search('\(<a href=[\'"]?([^\'" >]+)"', tdinfo[0])
+                if url:
+                    rport_lists.append(url.group(1))
+                else:
+                    print ("not added")
+        elif(re.search('>User generated Reports</h2>', browser.page_source)):
+            print("Totara 9")
+            print ("Searching Table")
+            table_body = browser.find_element_by_xpath('//*[@class="generaltable"]/tbody')
+            table_trs = table_body.find_elements_by_tag_name("tr")
+            for trs in table_trs:
+                tdinfo = []
+                tdinf = trs.find_element_by_xpath('td[@class="cell c0"]')
+                tdinfo.append(tdinf.get_attribute('innerHTML'))
+                url = re.search('\(<a href=[\'"]?([^\'" >]+)"', tdinfo[0])
+                if url:
+                    rport_lists.append(url.group(1))
+                else:
+                    print ("not added")
+
+
+
+        else:
+            sleep(2)
+            check_loop + check_loop + 1
+            print("wating")
+        ##For totara 9
+
+
+
+
+
+        #pulling the reports down
+        for rlsit in rport_lists:
+            browser.get(rlsit)
+            browser.find_element_by_xpath('//*[@name="export" and @type="submit" and @value="Export" and @id="id_export"]').click()
+        #wait 10 seconds for all reports to finsh downloading
+        sleep(10)
+        break
+
+
+
+##enable/Disable matiance mode
+def set_maintenancemode(lms_site,maiopt):
+    browser.get(lms_site+'/admin/settings.php?section=maintenancemode')
+    sleep (2)
+    check_loop=0
+    while( check_loop<70):
+        if (re.search('page-admin-setting-maintenancemode', browser.page_source)):
+            if (re.search('<option value="1" selected="selected">Enable</option>', browser.page_source) and maiopt == 'Enable'  or re.search('<option value="1" selected="selected">Disable</option>', browser.page_source) and maiopt == 'Disable'):
+                print ("matiance is oready set as " + maiopt)
+                break
+            else:
+                browser.find_element_by_xpath("//select[@id='id_s__maintenance_enabled']/option[text()='"+maiopt+"']").click()
+                browser.find_element_by_xpath('//*[@type="submit" and @value="Save changes"]').click()
+                print ("its been set")
+        check_loop=0
+        while( check_loop<70):
+            if (re.search('Changes saved', browser.page_source)):
+                print("changes saved")
+                break
+            else:
+                sleep(2)
+        else:
+            sleep(2)
+        break
+
+
+
 ##Disables content market
 def disable_content_market(lms_site,lms_version):
     if (lms_version >= "11"):
-        #http://10.20.56.137/admin/tool/capability/index.php
         browser.get(lms_site+'/admin/tool/capability/index.php')
         check_loop=0
         while( check_loop<70):
@@ -199,12 +297,8 @@ def disable_content_market(lms_site,lms_version):
                 browser.find_element_by_xpath('//*[@type="submit" and @value="Save changes"]').click()
                 disable_content_market(lms_site,lms_version)
                 break
-
-
-
     else:
         print("Incorect Version ")
-
 ## Purge the LMS cache
 def purgecache(lms_site,lms_version):
     if (lms_version >= "11"):
@@ -522,8 +616,6 @@ def modify_settheme(lmsurl,themename):
         else:
             sleep(2)
             check_loop = check_loop + 1
-
-
 
 def modify_setadmin(lmsdata):
     browser.get(lmsdata['url']+'/admin/roles/admins.php')
