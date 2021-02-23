@@ -58,7 +58,13 @@ When the current-lms is pulled down, it Will
 * Create packages up new LMS zip file
 * pulls upgradekey form config file
 
-
+### lmsupgradedo.py (to be done soon)
+This script complete basic part of the upgrade process
+* If found upgrade key will run it
+* check plugins are all correct
+* checks for issues
+* Goes to admin page and accpets changes
+* Then Runs same checks as lmscheck.py does
 
 ### lmsinstallprep.py
 This script preps the install package ready for deployment
