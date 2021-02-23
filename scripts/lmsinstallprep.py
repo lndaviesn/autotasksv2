@@ -6,38 +6,18 @@ from time import sleep
 import functions.get_lms_plugins as lmsplugins
 import functions.get_lms_mods as lmsmods
 import includes.installdb as installdb
-from distutils.dir_util import copy_tree
+import functions.globalfun as glfun
 from cryptography.fernet import Fernet
 import functions.gpg as gpg
 from getpass import getpass
 
-#######################################
-def copyDirectory(src, dest):
-    try:
-#        shutil.copytree(src, dest)
-        copy_tree(src, dest)
-    # Directories are the same
-    except shutil.Error as e:
-        print('Directory not copied. Error: %s' % e)
-    # Any error saying that the directory doesn't exist
-    except OSError as e:
-        print('Directory not copied. Error: %s' % e)
-
-def createdir(folder):
-    try:
-        os.mkdir(folder)
-    except OSError:
-        print ("Creation of the directory failed")
-    else:
-        print ("Successfully created the directory")
 
 
-##########################################
 
 lmsdata={}
 spath = os.getcwd()
 lmsdata["nwlmsfolder"] = spath + "/new-lms/"
-createdir(lmsdata["nwlmsfolder"])
+glfun.createdir(lmsdata["nwlmsfolder"])
 
 
 #added mode for config or upgarde.json file
@@ -150,9 +130,9 @@ data['lmsettings']=lmsinsmyjson
 with open( configpath, 'w', encoding='utf-8') as f:
     json.dump(data, f, ensure_ascii=False, indent=4)
 
-createdir(lmsdata["currentlmspath"])
+glfun.createdir(lmsdata["currentlmspath"])
 ##getting plugins
-createdir(lmsdata["pluginspath"])
+glfun.createdir(lmsdata["pluginspath"])
 #make plugin folder
 print ("Getting Plugins")
 for i in data['plugins']:
@@ -188,7 +168,7 @@ zipcmd = 'zip -qr ' + zipname + ' ' + lmsfodname
 #Create zip file of corelms
 print("Applying LMS core")
 ##Copy corelms to folder
-copyDirectory(lmsdata["newlmspath"],lmsfodpath)
+glfun.createdir(lmsdata["newlmspath"],lmsfodpath)
 for name in glob.glob(lmsfodpath + "/.git"):
     if os.path.isdir(name) == True:
         print ("removed folder")
@@ -196,31 +176,31 @@ for name in glob.glob(lmsfodpath + "/.git"):
     if os.path.isfile(name) == True:
         print ("It be an file")
 
-copyDirectory(lmsdata["newlmspath"], lmsdata["nwlmsfolder"] + "/totara")
+glfun.createdir(lmsdata["newlmspath"], lmsdata["nwlmsfolder"] + "/totara")
 
 if os.path.exists(lmsdata["pluginspath"]):
     #Copy plugins to folder
     print("Applying LMS plugins")
-    copyDirectory(lmsdata["pluginspath"],lmsfodpath)
+    glfun.createdir(lmsdata["pluginspath"],lmsfodpath)
     for name in glob.glob(lmsfodpath + "/.git"):
         if os.path.isdir(name) == True:
             print ("removed folder")
             shutil.rmtree(lmsfodpath + "/.git")
         if os.path.isfile(name) == True:
             print ("It be an file")
-    copyDirectory(lmsdata["pluginspath"], lmsdata["nwlmsfolder"] + "/plugins")
+    glfun.createdir(lmsdata["pluginspath"], lmsdata["nwlmsfolder"] + "/plugins")
 
 if os.path.exists(lmsdata["modspath"]):
     ##Copy mods to folder
     print("Applying LMS mods")
-    copyDirectory(lmsdata["modspath"],lmsfodpath)
+    glfun.createdir(lmsdata["modspath"],lmsfodpath)
     for name in glob.glob(lmsfodpath + "/.git"):
         if os.path.isdir(name) == True:
             print ("removed folder")
             shutil.rmtree(lmsfodpath + "/.git")
         if os.path.isfile(name) == True:
             print ("It be an file")
-    copyDirectory(lmsdata["modspath"], lmsdata["nwlmsfolder"] + "/mods")
+    glfun.createdir(lmsdata["modspath"], lmsdata["nwlmsfolder"] + "/mods")
 
 os.system(zipcmd)
 shutil.copyfile(zipname,lmsdata["nwlmsfolder"]+zipname)

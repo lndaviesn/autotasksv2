@@ -6,50 +6,14 @@ from time import sleep
 import functions.get_lms_plugins as lmsplugins
 import functions.get_lms_mods as lmsmods
 import functions.totara_config as totara_config
-from distutils.dir_util import copy_tree
+import functions.globalfun as glfun
 
-#######################################
-def copyDirectory(src, dest):
-    try:
-#        shutil.copytree(src, dest)
-        copy_tree(src, dest)
-    # Directories are the same
-    except shutil.Error as e:
-        print('Directory not copied. Error: %s' % e)
-    # Any error saying that the directory doesn't exist
-    except OSError as e:
-        print('Directory not copied. Error: %s' % e)
-
-def createdir(folder):
-    try:
-        os.mkdir(folder)
-    except OSError:
-        print ("Creation of the directory failed")
-    else:
-        print ("Successfully created the directory")
-def gitclear(folderrp):
-    gitlist = ['.git','.gitignore']
-    for gitfold in gitlist:
-        print (gitfold)
-        for name in glob.glob(folderrp + "/"+gitfold):
-            if os.path.isdir(name) == True:
-                print ("!!removed folder!!")
-                print (name)
-                shutil.rmtree(name)
-            if os.path.isfile(name) == True:
-                print ("!!It be an file!!")
-                os.remove(name)
-
-
-
-
-##########################################
 
 lmsdata={}
 spath = os.getcwd()
 lmsdata["uplmsfolder"] = spath + "/upgrade-lms/"
 lmsdata["curlmsfolder"] = spath + "/current-lms/"
-createdir(lmsdata["uplmsfolder"])
+glfun.createdir(lmsdata["uplmsfolder"])
 
 
 #added mode for config or upgarde.json file
@@ -131,7 +95,7 @@ with open( configpath, 'w', encoding='utf-8') as f:
 
 
 ##getting plugins
-createdir(lmsdata["pluginspath"])
+glfun.createdir(lmsdata["pluginspath"])
 #make plugin folder
 print ("Getting Plugins")
 for i in data['plugins']:
@@ -154,7 +118,7 @@ print ("Getting corelms using Git")
 with Git().custom_environment(GIT_SSH_COMMAND=git_ssh_cmd):
     gitrepo = Repo.clone_from(lmsdata["gitrepo"], repofolder, branch=repotag)
 print ("Removing git folder")
-gitclear(repofolder)
+glfun.gitclear(repofolder)
 
 
 print ("Generating ZIP file")
@@ -176,25 +140,25 @@ zipcmd = 'zip -qr ' + zipname + ' ' + lmsfodname
 #Create zip file of corelms
 print("Applying LMS core")
 ##Copy corelms to folder
-copyDirectory(lmsdata["newlmspath"],lmsfodpath)
-gitclear(lmsfodpath)
+glfun.copyDirectory(lmsdata["newlmspath"],lmsfodpath)
+glfun.gitclear(lmsfodpath)
 
-copyDirectory(lmsdata["newlmspath"], lmsdata["uplmsfolder"] + "/totara")
+glfun.copyDirectory(lmsdata["newlmspath"], lmsdata["uplmsfolder"] + "/totara")
 
 if os.path.exists(lmsdata["pluginspath"]):
     #Copy plugins to folder
     print("Applying LMS plugins")
-    copyDirectory(lmsdata["pluginspath"],lmsfodpath)
-    gitclear(lmsfodpath)
+    glfun.copyDirectory(lmsdata["pluginspath"],lmsfodpath)
+    glfun.gitclear(lmsfodpath)
 
-    copyDirectory(lmsdata["pluginspath"], lmsdata["uplmsfolder"] + "/plugins")
+    glfun.copyDirectory(lmsdata["pluginspath"], lmsdata["uplmsfolder"] + "/plugins")
 
 if os.path.exists(lmsdata["modspath"]):
     ##Copy mods to folder
     print("Applying LMS mods")
-    copyDirectory(lmsdata["modspath"],lmsfodpath)
-    gitclear(lmsfodpath)
-    copyDirectory(lmsdata["modspath"], lmsdata["uplmsfolder"] + "/mods")
+    glfun.copyDirectory(lmsdata["modspath"],lmsfodpath)
+    glfun.gitclear(lmsfodpath)
+    glfun.copyDirectory(lmsdata["modspath"], lmsdata["uplmsfolder"] + "/mods")
 
 
 shutil.copy2(lmsdata["currentlmspath"] + "/config.php",lmsdata["uplmsfolder"]+"/config.php")
