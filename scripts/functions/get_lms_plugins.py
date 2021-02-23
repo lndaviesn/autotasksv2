@@ -4,8 +4,10 @@ from zipfile import ZipFile
 from git import Repo
 from git import Git
 import includes.plugindb as plugindb
+import functions.globalfun as glfun
 from distutils.dir_util import copy_tree
 
+###############################
 def copyDirectory(src, dest):
     try:
         copy_tree(src, dest)
@@ -15,6 +17,9 @@ def copyDirectory(src, dest):
     # Any error saying that the directory doesn't exist
     except OSError as e:
         sys.exit('Directory not copied. Error: %s' % e)
+
+#########################################
+
 
 def pull(plugindata, lmsdata):
     plugin_found = False
@@ -49,7 +54,7 @@ def get(plugindata, lmsdata):
                 url = x['repo']
                 os.mkdir(filedump)
                 #checks if the repo is an zip file
-                if url.find('.zip') != -1: 
+                if url.find('.zip') != -1:
                     print ("Found zip content")
                     savefilepath = filedump + "/" + x['name'] + ".zip"
                     copyto = lmsdata["pluginspath"] + "/" + x['path']
@@ -78,10 +83,7 @@ def get(plugindata, lmsdata):
                 try:
                     with Git().custom_environment(GIT_SSH_COMMAND=git_ssh_cmd):
                         gitrepo = Repo.clone_from(x['repo'], repofolder, branch=x['branch'])
-                    if os.path.exists(repofolder + "/.git"):
-                        shutil.rmtree(repofolder +"/.git")
-                    if os.path.exists(repofolder + "/readme.md"):
-                        os.remove(repofolder + "/readme.md")
+                    glfun.gitclear(repofolder)
                     copyingfrom = gitdump + "/" + x['path']
                     copyingto = lmsdata["pluginspath"] + "/" + x['path']
                     copyDirectory(copyingfrom, copyingto)
