@@ -337,9 +337,6 @@ def hideblock(lms_site,blockname):
         else:
             sleep(2)
 
-
-
-
 # LMS install
 ##lowimportance
 #dbname,dbuser,dbpass,adminuser,adminpass,adminemail, sitefullname, siteshortname

@@ -94,12 +94,10 @@ new=[
 {"name":"auth_saml2","media":"git","repo":"ssh://git@github.com/catalyst/moodle-auth_saml2.git","branch":"2019022100","lmsversion":"10","path":"auth/saml2"},
 {"name":"auth_saml2","media":"git","repo":"ssh://git@github.com/catalyst/moodle-auth_saml2.git","branch":"2019022100","lmsversion":"9","path":"auth/saml2"},
 
-
 {"name":"block_accessibility","media":"curl","repo":"https://moodle.org/plugins/download.php/14021/block_accessibility_moodle31_2017051700.zip","branch":"2017051700","lmsversion":"12","path":"block/"},
 {"name":"block_accessibility","media":"curl","repo":"https://moodle.org/plugins/download.php/14021/block_accessibility_moodle31_2017051700.zip","branch":"2017051700","lmsversion":"11","path":"block/"},
 {"name":"block_accessibility","media":"curl","repo":"https://moodle.org/plugins/download.php/14021/block_accessibility_moodle31_2017051700.zip","branch":"2017051700","lmsversion":"10","path":"block/"},
 {"name":"block_accessibility","media":"curl","repo":"https://moodle.org/plugins/download.php/8385/block_accessibility_moodle29_2015011600.zip","branch":"2015011600","lmsversion":"9","path":"block/"}
-
 ]
 
 
