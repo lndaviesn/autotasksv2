@@ -54,7 +54,7 @@ def login(lguser,lgpass):
     sleep(3)
     check_loop=0
     while( check_loop<70):
-        if (re.search('id="page-site-index"', browser.page_source)):
+        if (re.search('id="page-site-index"', browser.page_source) or  re.search('<span class="usertext">', browser.page_source)):
             break
         else:
             sleep(2)
@@ -70,14 +70,9 @@ def maxerr():
 def close():
     sleep (10)
     browser.quit()
-
-
-
-
 #Checks
 
 ##Check all plugins ae correct
-
 def check_plugins(lms_site):
     d = dict()
     d['finalcheck'] = True
@@ -218,17 +213,10 @@ def get_reports(lms_site,dpath):
                     rport_lists.append(url.group(1))
                 else:
                     print ("not added")
-
-
-
         else:
             sleep(2)
             check_loop + check_loop + 1
             print("wating")
-        ##For totara 9
-
-
-
 
 
         #pulling the reports down
@@ -238,6 +226,8 @@ def get_reports(lms_site,dpath):
         #wait 10 seconds for all reports to finsh downloading
         sleep(10)
         break
+
+
 
 
 
@@ -318,6 +308,37 @@ def purgecache(lms_site,lms_version):
             else:
                 print ("Wating for cache to clear")
                 sleep(2)
+
+##hide course nav
+def hideblock(lms_site,blockname):
+    print ("Disableing " + blockname +" Block")
+    browser.get(lms_site+'/admin/blocks.php')
+    check_loop=0
+    while( check_loop<70):
+        if (re.search('<h2>Blocks</h2>', browser.page_source)):
+            print("lets do stuff")
+            table_id = browser.find_element_by_xpath('//*[@id="compatibleblockstable"]')
+            table_body = table_id.find_elements_by_tag_name("tbody")
+            for body in table_body:
+                body_tr = body.find_elements_by_tag_name("tr")
+                for btr in body_tr:
+                    if (re.search(blockname, btr.text)):
+                        body_td = btr.find_elements_by_tag_name("td")
+                        for btd in body_td:
+                            testll = btd.find_elements_by_tag_name("a")
+                            for leang in testll:
+                                if (leang.text == "Hide"):
+                                    leang.click()
+                                    return
+                                else:
+                                    break
+                            sleep(10)
+            break
+        else:
+            sleep(2)
+
+
+
 
 # LMS install
 ##lowimportance

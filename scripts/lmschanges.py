@@ -56,6 +56,9 @@ if (int(ver_major) >= 9):
     totara.purgecache(url,ver_major)
     print ("Cache Purged")
 
+if (int(ver_major) >= 12):
+    totara.hideblock(url,'Course navigation')
+
 
 
 ##clouse the LMS page
