@@ -119,6 +119,7 @@ def check_version(lms_site):
 
 #to monitor when the upgrade is done
 def check_upgardeprogs():
+    upgans = False
     check_loop=0
     while( check_loop<70):
         #Check to see if we are on the page
@@ -127,14 +128,17 @@ def check_upgardeprogs():
             check_loop2=0
             while( check_loop2<70):
                 if (browser.find_element_by_xpath('//*[@type="submit"]')):
-                    print ("ok upgrade completed")
+                    upgans = True
                     break
                 else:
                     sleep(5)
                     check_loop2 = check_loop2 +1
+            break
         else:
             sleep(5)
             check_loop = check_loop +1
+    return upgans
+
 
 ##Check all plugins ae correct
 def check_plugins(lms_site):
@@ -322,7 +326,6 @@ def set_maintenancemode(lms_site,maiopt):
         check_loop=0
         while( check_loop<70):
             if (re.search('Changes saved', browser.page_source)):
-                print("changes saved")
                 break
             else:
                 sleep(2)
