@@ -1,4 +1,4 @@
-import os, shutil, sys, glob, hashlib
+import os, shutil, sys, glob, hashlib, path
 from distutils.dir_util import copy_tree
 
 def gitclear(folderrp):
@@ -27,11 +27,12 @@ def copyDirectory(src, dest):
 
 def createdir(folder):
     try:
-        os.mkdir(folder)
+        if (path.isdir(folder)):
+            print (folder + " Or ready Craeted")
+        else:
+            os.mkdir(folder)
     except OSError:
         print ("Creation of the directory failed")
-    else:
-        print ("Successfully created the directory")
 
 
 def gethash(filename):
