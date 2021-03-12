@@ -115,10 +115,12 @@ def check_plugins(lms_site):
             break
         else:
             sleep(2)
-            if (re.search('<h1>Plugins check</h1>', browser.page_source) ):
-                table_id = browser.find_element_by_xpath('//*[@id="plugins-check"]')
-            elif (re.search('<h2>Plugins overview</h2>', browser.page_source)):
-                table_id = browser.find_element_by_xpath('//*[@id="plugins-control-panel"]')
+    if (re.search('<h1>Plugins check</h1>', browser.page_source) ):
+        print ("matched")
+        table_id = browser.find_element_by_xpath('//*[@id="plugins-check"]')
+    elif (re.search('<h2>Plugins overview</h2>', browser.page_source)):
+        print ("matched")
+        table_id = browser.find_element_by_xpath('//*[@id="plugins-control-panel"]')
     row_len=len(table_id.find_elements_by_tag_name("td"))
     rows = table_id.find_elements_by_tag_name("td") # get all of the rows in the table
     td_count=1
