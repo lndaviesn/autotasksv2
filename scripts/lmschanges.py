@@ -40,11 +40,15 @@ print ("I am about to make change to the LMS that are required")
 url = "https://" + data['lmsaddress']
 totara.webb(url,False)
 totara.login(decryt(data['lmsserver_user']),decryt(data['lmsserver_pass']))
+versplit = totara.check_version(url)
+print ("Getting Version number")
+if (versplit['error'] == False):
+    ver_major = versplit['major']
+    ver_minor = versplit['minor']
+    print ("Version: " + ver_major + "." + ver_minor)
+else:
+    sys.exit(versplit['errormsg'])
 
-versplit = data['lmsupgardeversion'].split('.')
-ver_major = versplit[0]
-ver_minor = versplit[1]
-print (ver_major)
 if (int(ver_major) >= 10):
     print ("Disabling Content Market")
     totara.disable_content_market(url,ver_major)
