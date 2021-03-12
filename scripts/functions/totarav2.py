@@ -388,12 +388,10 @@ def purgecache(lms_site,lms_version):
 
 ##hide course nav
 def hideblock(lms_site,blockname):
-    print ("Disableing " + blockname +" Block")
     browser.get(lms_site+'/admin/blocks.php')
     check_loop=0
     while( check_loop<70):
         if (re.search('<h2>Blocks</h2>', browser.page_source)):
-            print("lets do stuff")
             table_id = browser.find_element_by_xpath('//*[@id="compatibleblockstable"]')
             table_body = table_id.find_elements_by_tag_name("tbody")
             for body in table_body:
