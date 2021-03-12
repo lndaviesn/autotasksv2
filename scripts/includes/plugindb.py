@@ -38,8 +38,8 @@ paths = [
 
 
 new=[
-{"name":"theme_lnroots","media":"git","repo":"ssh://git@github.com/LearningNexus/totara-theme.git","branch":"2018112201","lmsversion":"12","path":"theme/"},
-{"name":"theme_lnroots","media":"git","repo":"ssh://git@github.com/LearningNexus/totara-theme.git","branch":"2018022702","lmsversion":"11","path":"theme/"},
+{"name":"theme_lnroots","media":"git","repo":"ssh://git@github.com/LearningNexus/totara-theme.git","branch":"2018112202","lmsversion":"12","path":"theme/"},
+{"name":"theme_lnroots","media":"git","repo":"ssh://git@github.com/LearningNexus/totara-theme.git","branch":"2018022703","lmsversion":"11","path":"theme/"},
 {"name":"theme_lnroots","media":"git","repo":"ssh://git@github.com/LearningNexus/totara-theme.git","branch":"2018120400","lmsversion":"10","path":"theme/"},
 {"name":"theme_lnroots","media":"git","repo":"ssh://git@github.com/LearningNexus/totara-theme.git","branch":"2017052204","lmsversion":"9","path":"theme/"},
 
