@@ -51,7 +51,6 @@ if res['finalcheck'] == False:
     sys.exit("An issue was found with plugins")
 
 res = totara.check_security(url)
-res = totara.check_security(url)
 if res['counts']['err'] > 0:
     testres = False
     print("Some LMS security Warining have been found")
@@ -78,4 +77,4 @@ if testres == True:
     print ("All Tests came out clear")
 else:
     totara.close()
-    print ("Some tests shows some issues but nothing to stop LMS running")    
+    print ("Some tests shows some issues but nothing to stop LMS running")
