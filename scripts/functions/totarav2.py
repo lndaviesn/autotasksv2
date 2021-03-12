@@ -26,6 +26,16 @@ def webb(addr,min):
     if (min == True):
         browser.minimize_window()
 
+##Maxmise the window
+def maxerr():
+    sleep (2)
+    browser.maximize_window()
+
+##Close the LMS window
+def close():
+    sleep (10)
+    browser.quit()
+
 ##logins
 def login(lguser,lgpass):
     check_loop=0
@@ -47,6 +57,11 @@ def login(lguser,lgpass):
                 except Exception as e:
                     sleep(5)
                     print (e)
+                    try:
+                        browser.find_element_by_xpath('//*[@class="showlogin"]').click()
+                    except Exception as e:
+                        sleep(5)
+                        print (e)
             else:
                 break
         else:
@@ -59,32 +74,51 @@ def login(lguser,lgpass):
         else:
             sleep(2)
 
-##Maxmise the window
-def maxerr():
-    sleep (2)
-    browser.maximize_window()
+#Upgrade
+##enter upgradkey
+def upgrade_upgradekey(lms_site,upkey):
+    browser.get(lms_site+'/admin/index.php')
+    check_loop=0
+    while( check_loop<70):
+        if (re.search('<div class="upgradekeyreq">', browser.page_source)):
+            lg_upgardekey = browser.find_element_by_xpath('//*[@name="upgradekey" and @type="password"]')
+            lg_upgardekey.clear()
+            lg_upgardekey.send_keys(upkey)
+            sleep(2)
+            browser.find_element_by_xpath('//*[@type="submit" and @value="Submit"]').click()
+            break
+        else:
+            sleep(2)
+            check_loop = check_loop +1
 
+def upgrade_goon_buttion(value_text):
+    check_loop=0
+    while( check_loop<70):
+        if (browser.find_element_by_xpath('//*[@type="submit" and @value="'+value_text+'"]')):
+            browser.find_element_by_xpath('//*[@type="submit" and @value="'+value_text+'"]').click()
+            break
+        else:
+            sleep(2)
+            check_loop = check_loop +1
 
-
-##Close the LMS window
-def close():
-    sleep (10)
-    browser.quit()
 #Checks
-
 ##Check all plugins ae correct
 def check_plugins(lms_site):
     d = dict()
     d['finalcheck'] = True
-    browser.get(lms_site+'/admin/plugins.php')
+    if (lms_site != "nourl"):
+        browser.get(lms_site+'/admin/plugins.php')
     sleep (2)
     check_loop=0
     while( check_loop<70):
-        if (re.search('<h2>Plugins overview</h2>', browser.page_source)):
+        if (re.search('<h2>Plugins overview</h2>', browser.page_source) or re.search('<h1>Plugins check</h1>', browser.page_source) ):
             break
         else:
             sleep(2)
-    table_id = browser.find_element_by_xpath('//*[@id="plugins-control-panel"]')
+            if (re.search('<h1>Plugins check</h1>', browser.page_source) ):
+                table_id = browser.find_element_by_xpath('//*[@id="plugins-check"]')
+            elif (re.search('<h2>Plugins overview</h2>', browser.page_source)):
+                table_id = browser.find_element_by_xpath('//*[@id="plugins-control-panel"]')
     row_len=len(table_id.find_elements_by_tag_name("td"))
     rows = table_id.find_elements_by_tag_name("td") # get all of the rows in the table
     td_count=1
@@ -107,11 +141,12 @@ def check_certs(lms_site):
 def check_envextra(lms_site):
     d = dict()
     d['finalcheck'] = True
-    browser.get(lms_site+'/admin/environment.php')
+    if (lms_site != "nourl"):
+        browser.get(lms_site+'/admin/environment.php')
     sleep (2)
     check_loop=0
     while( check_loop<70):
-        if (re.search('>Environment</h2>', browser.page_source)):
+        if (re.search('>Environment</h2>', browser.page_source) or re.search('Server checks</h2>', browser.page_source)):
             break
         else:
             sleep(2)
@@ -220,9 +255,15 @@ def get_reports(lms_site,dpath):
 
 
         #pulling the reports down
+        print ("Downloading reports")
+        rcount = 0
         for rlsit in rport_lists:
-            browser.get(rlsit)
-            browser.find_element_by_xpath('//*[@name="export" and @type="submit" and @value="Export" and @id="id_export"]').click()
+            if (rcount > 9):
+                continue
+            else:
+                browser.get(rlsit)
+                browser.find_element_by_xpath('//*[@name="export" and @type="submit" and @value="Export" and @id="id_export"]').click()
+                rcount = rcount + 1
         #wait 10 seconds for all reports to finsh downloading
         sleep(10)
         break
