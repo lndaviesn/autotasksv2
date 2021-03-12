@@ -1,15 +1,15 @@
 import sys, os, base64, gnupg, getpass
 
 current_user= getpass.getuser()
-gpg_email = "nigel.davies@learningnexus.co.uk"
+gpgrecipients = "nigel.davies@learningnexus.co.uk"
 gpg_path="/home/"+current_user+"/.gnupg/"
 gpg = gnupg.GPG(gnupghome=gpg_path)
-#gpg.use_agent = True
+gpg.use_agent = True
 
 
 def enc(unencrypted_string):
     #enc the data
-    encrypted_data = gpg.encrypt(unencrypted_string)
+    encrypted_data = gpg.encrypt(unencrypted_string,gpgrecipients)
     encrypted_string = str(encrypted_data)
     message = encrypted_string
     message_bytes = message.encode('ascii')
