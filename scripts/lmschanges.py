@@ -61,7 +61,9 @@ if (int(ver_major) >= 9):
     print ("Cache Purged")
 
 if (int(ver_major) >= 12):
+    print ("Hiding Course navigation")
     totara.hideblock(url,'Course navigation')
+    print ("Hiding Course navigation Done")
 
 
 
