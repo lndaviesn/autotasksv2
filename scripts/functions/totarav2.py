@@ -102,6 +102,40 @@ def upgrade_goon_buttion(value_text):
             check_loop = check_loop +1
 
 #Checks
+#version number
+def check_version(lms_site):
+    fullversion={}
+    browser.get(lms_site+'/admin')
+    totara_copyinfo = browser.find_element_by_xpath('//*[@class="totara-copyright"]')
+    ver_info = re.findall('Version ([0-9]+).([0-9]+) \(Build\: [0-9]+\.[0-9]+\)',totara_copyinfo.text)
+    if (ver_info):
+        fullversion['error'] = False
+        fullversion['major'] =  ver_info[0][0]
+        fullversion['minor'] =  ver_info[0][1]
+    else:
+        fullversion['error'] = True
+        fullversion['errormsg'] = "Cant find version number"
+    return fullversion
+
+#to monitor when the upgrade is done
+def check_upgardeprogs():
+    check_loop=0
+    while( check_loop<70):
+        #Check to see if we are on the page
+        if (re.search('Upgrading to new version', browser.page_source)):
+            #if we are will wait for the complete buttion to show up
+            check_loop2=0
+            while( check_loop2<70):
+                if (browser.find_element_by_xpath('//*[@type="submit"]')):
+                    print ("ok upgrade completed")
+                    break
+                else:
+                    sleep(5)
+                    check_loop2 = check_loop2 +1
+        else:
+            sleep(5)
+            check_loop = check_loop +1
+
 ##Check all plugins ae correct
 def check_plugins(lms_site):
     d = dict()
@@ -285,7 +319,6 @@ def set_maintenancemode(lms_site,maiopt):
             else:
                 browser.find_element_by_xpath("//select[@id='id_s__maintenance_enabled']/option[text()='"+maiopt+"']").click()
                 browser.find_element_by_xpath('//*[@type="submit" and @value="Save changes"]').click()
-                print ("its been set")
         check_loop=0
         while( check_loop<70):
             if (re.search('Changes saved', browser.page_source)):
