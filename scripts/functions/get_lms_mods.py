@@ -86,6 +86,5 @@ def pull(lmsdata):
         #need top copy to frompath with extras
         glfun.copyDirectory(topath, frompath+"-pulldlms")
 
-
     if (modfound is False):
         print ("No mods found from any resource")
