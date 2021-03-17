@@ -1,14 +1,13 @@
 #!/usr/bin/env python
 from selenium import webdriver
 from selenium.webdriver.support.ui import Select
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.webdriver.common.keys import Keys
-from time import sleep
-import re
-import string
-import random
-import mmap
-import os
+from selenium.webdriver.common.by import By
+from selenium.common.exceptions import *
+import re, string, random, mmap, os, time
 #Basics
 
 ##Loads the webpage
@@ -22,18 +21,19 @@ def webb(addr,min):
     profile.set_preference("browser.helperApps.alwaysAsk.force", False)
     profile.set_preference("browser.download.dir", "/tmp/")
     browser = webdriver.Firefox(firefox_profile=profile)
+    browser.implicitly_wait(20) # seconds
     browser.get(addr+"/?saml=off")
     if (min == True):
         browser.minimize_window()
 
 ##Maxmise the window
 def maxerr():
-    sleep (2)
+    time.sleep(2)
     browser.maximize_window()
 
 ##Close the LMS window
 def close():
-    sleep (10)
+    time.sleep(10)
     browser.quit()
 
 ##logins
@@ -50,29 +50,30 @@ def login(lguser,lgpass):
                 lg_username.send_keys(lgpass)
                 browser.find_element_by_xpath('//*[@id="loginbtn"]').click()
             except Exception as e:
-                sleep(2)
+                time.sleep(2)
                 print (e)
                 try:
                     browser.find_element_by_xpath('//*[@class="showLogin"]').click()
                 except Exception as e:
-                    sleep(5)
+                    time.sleep(5)
                     print (e)
                     try:
                         browser.find_element_by_xpath('//*[@class="showlogin"]').click()
                     except Exception as e:
-                        sleep(5)
+                        time.sleep(5)
                         print (e)
             else:
                 break
         else:
-            sleep(2)
-    sleep(3)
+            time.sleep(2)
+    time.sleep(3)
     check_loop=0
     while( check_loop<70):
-        if (re.search('id="page-site-index"', browser.page_source) or  re.search('<span class="usertext">', browser.page_source)):
+        if (re.search('id="page-site-index"', browser.page_source) or  re.search('class="usertext"', browser.page_source)):
+            print ("Login found")
             break
         else:
-            sleep(2)
+            time.sleep(2)
 
 #Upgrade
 ##enter upgradkey
@@ -84,23 +85,21 @@ def upgrade_upgradekey(lms_site,upkey):
             lg_upgardekey = browser.find_element_by_xpath('//*[@name="upgradekey" and @type="password"]')
             lg_upgardekey.clear()
             lg_upgardekey.send_keys(upkey)
-            sleep(2)
+            time.sleep(2)
             browser.find_element_by_xpath('//*[@type="submit" and @value="Submit"]').click()
             break
         else:
-            sleep(2)
+            time.sleep(2)
             check_loop = check_loop +1
 
 def upgrade_goon_buttion(value_text):
-    check_loop=0
-    while( check_loop<70):
-        if (browser.find_element_by_xpath('//*[@type="submit" and @value="'+value_text+'"]')):
-            browser.find_element_by_xpath('//*[@type="submit" and @value="'+value_text+'"]').click()
-            break
-        else:
-            sleep(2)
-            check_loop = check_loop +1
-
+        try:
+            wait = WebDriverWait(browser, 630, poll_frequency=10, ignored_exceptions=[ElementNotVisibleException, ElementNotSelectableException])
+            wait.until(EC.element_to_be_clickable((By.XPATH, '//input[@value="'+value_text+'" and @type="submit"]'))).click()
+        except Exception as e:
+            print ("Somthing happened")
+            browser.refresh()
+            time.sleep(10)
 #Checks
 #version number
 def check_version(lms_site):
@@ -121,23 +120,24 @@ def check_version(lms_site):
 def check_upgardeprogs():
     upgans = False
     check_loop=0
-    while( check_loop<70):
-        #Check to see if we are on the page
-        if (re.search('Upgrading to new version', browser.page_source)):
-            #if we are will wait for the complete buttion to show up
-            check_loop2=0
-            while( check_loop2<70):
-                if (browser.find_element_by_xpath('//*[@type="submit"]')):
+    print ("Wating for Upgrade to complete")
+    wait = WebDriverWait(browser, 240, poll_frequency=1, ignored_exceptions=[ElementNotVisibleException, ElementNotSelectableException, TimeoutException])
+    try:
+        print("next-level")
+        if (wait.until(EC.presence_of_element_located((By.TAG_NAME, 'title')))):
+            print ("found title")
+            if (wait.until(EC.title_contains('Upgrading to new version'))):
+                print ("on the page")
+                if (wait.until(EC.presence_of_element_located((By.CLASS, 'continuebutton')))):
+                    print ("Found the buttion class")
                     upgans = True
-                    break
-                else:
-                    sleep(5)
-                    check_loop2 = check_loop2 +1
-            break
+    except TimeoutException as ex:
+        repans = input("Upgrade has errord or timed out do you wish to carry on [Y/n]: ")
+        if (repans == 'Y' or repans == 'y'):
+            upgans = True
         else:
-            sleep(5)
-            check_loop = check_loop +1
-    return upgans
+            upgans = False    
+        return upgans
 
 
 ##Check all plugins ae correct
@@ -146,13 +146,13 @@ def check_plugins(lms_site):
     d['finalcheck'] = True
     if (lms_site != "nourl"):
         browser.get(lms_site+'/admin/plugins.php')
-    sleep (2)
+    time.sleep(2)
     check_loop=0
     while( check_loop<70):
         if (re.search('<h2>Plugins overview</h2>', browser.page_source) or re.search('<h1>Plugins check</h1>', browser.page_source) ):
             break
         else:
-            sleep(2)
+            time.sleep(2)
     if (re.search('<h1>Plugins check</h1>', browser.page_source) ):
         table_id = browser.find_element_by_xpath('//*[@id="plugins-check"]')
     elif (re.search('<h2>Plugins overview</h2>', browser.page_source)):
@@ -181,13 +181,13 @@ def check_envextra(lms_site):
     d['finalcheck'] = True
     if (lms_site != "nourl"):
         browser.get(lms_site+'/admin/environment.php')
-    sleep (2)
+    time.sleep(2)
     check_loop=0
     while( check_loop<70):
         if (re.search('>Environment</h2>', browser.page_source) or re.search('Server checks</h2>', browser.page_source)):
             break
         else:
-            sleep(2)
+            time.sleep(2)
     table_id = browser.find_element_by_xpath('//*[@id="serverstatus"]')
     row_len=len(table_id.find_elements_by_tag_name("td"))
     rows = table_id.find_elements_by_tag_name("td") # get all of the rows in the table
@@ -234,7 +234,7 @@ def check_security(lms_site):
                 d['issues_n'] = issulist
             return d
         else:
-            sleep(2)
+            time.sleep(2)
             check_loop = check_loop + 1
 #LMS mods
 ##Get_reports
@@ -245,14 +245,14 @@ def get_reports(lms_site,dpath):
     browser_ui_search = browser.find_element_by_xpath('//*[@id="about-config-search"]')
     browser_ui_search.clear()
     browser_ui_search.send_keys("browser.download.dir")
-    sleep(4)
+    time.sleep(4)
     browser.find_element_by_xpath('//*[@data-l10n-id="about-config-pref-edit-button"]').click()
-    sleep(4)
+    time.sleep(4)
     browser_ui_mod_text = browser.find_element_by_xpath('//*[@id="prefs"]/tr[@class="has-user-value "]/td[@class="cell-value"]/form[@id="form-edit"]/input[@type="text"]')
     browser_ui_mod_text.clear()
     browser_ui_mod_text.send_keys(dpath)
     browser.find_element_by_xpath('//*[@id="prefs"]/tr[@class="has-user-value "]/td[@class="cell-edit"]/button[@title="Save"]').click()
-    sleep(4)
+    time.sleep(4)
     browser.get(lms_site+'/totara/reportbuilder/index.php')
     #https://wshelearn.learningnexus.co.uk/totara/reportbuilder/report.php?id=67
     check_loop = 0
@@ -287,7 +287,7 @@ def get_reports(lms_site,dpath):
                 else:
                     print ("not added")
         else:
-            sleep(2)
+            time.sleep(2)
             check_loop + check_loop + 1
             print("wating")
 
@@ -303,17 +303,13 @@ def get_reports(lms_site,dpath):
                 browser.find_element_by_xpath('//*[@name="export" and @type="submit" and @value="Export" and @id="id_export"]').click()
                 rcount = rcount + 1
         #wait 10 seconds for all reports to finsh downloading
-        sleep(10)
+        time.sleep(10)
         break
-
-
-
-
 
 ##enable/Disable matiance mode
 def set_maintenancemode(lms_site,maiopt):
     browser.get(lms_site+'/admin/settings.php?section=maintenancemode')
-    sleep (2)
+    time.sleep(2)
     check_loop=0
     while( check_loop<70):
         if (re.search('page-admin-setting-maintenancemode', browser.page_source)):
@@ -328,9 +324,9 @@ def set_maintenancemode(lms_site,maiopt):
             if (re.search('Changes saved', browser.page_source)):
                 break
             else:
-                sleep(2)
+                time.sleep(2)
         else:
-            sleep(2)
+            time.sleep(2)
         break
 
 
@@ -338,13 +334,35 @@ def set_maintenancemode(lms_site,maiopt):
 ##Disables content market
 def disable_content_market(lms_site,lms_version):
     if (lms_version >= "11"):
+#optionalsubsystems
+        browser.get(lms_site+'/admin/settings.php?section=optionalsubsystems')
+        check_loop=0
+        while( check_loop<70):
+            if (re.search('<h2>Advanced features</h2>', browser.page_source)):
+                #enablecontentmarketplaces
+                if (browser.find_element_by_xpath('//*[@type="checkbox" and @name="s__enablecontentmarketplaces"]').is_selected() == True):
+                    browser.find_element_by_xpath('//*[@type="checkbox" and @name="s__enablecontentmarketplaces"]').click()
+                    time.sleep(3)
+                    browser.find_element_by_xpath('//*[@type="submit" and @class="form-submit" and @value="Save changes"]').click()
+                    check_loop=0
+                    while( check_loop<70):
+                        if (re.search('<h2>Advanced features</h2>', browser.page_source)):
+                            break
+                        else:
+                            time.sleep(2)
+                            check_loop = check_loop + 1
+                break
+            else:
+                time.sleep(2)
+                check_loop = check_loop + 1
+#capability
         browser.get(lms_site+'/admin/tool/capability/index.php')
         check_loop=0
         while( check_loop<70):
             if (re.search('<span itemprop="title">Capability overview</span>', browser.page_source)):
                 break
             else:
-                sleep(2)
+                time.sleep(2)
         browser.find_element_by_xpath('//*[@id="capabilitysearch"]').send_keys('totara/contentmarketplace:config')
         browser.find_element_by_xpath('//*[@type="submit" and @value="Get the overview"]').click()
         table_id = browser.find_element_by_xpath('//*[@class="lastrow"]')
@@ -375,16 +393,16 @@ def purgecache(lms_site,lms_version):
             if (re.search('Purge all caches', browser.page_source)):
                 break
             else:
-                sleep(2)
+                time.sleep(2)
         browser.find_element_by_xpath('//*[@value="Purge all caches"]').click()
         check_loop=0
         while( check_loop<70):
             if (re.search('All caches were purged.', browser.page_source)):
-                sleep(2)
+                time.sleep(2)
                 break
             else:
                 print ("Wating for cache to clear")
-                sleep(2)
+                time.sleep(2)
 
 ##hide course nav
 def hideblock(lms_site,blockname):
@@ -407,10 +425,10 @@ def hideblock(lms_site,blockname):
                                     return
                                 else:
                                     break
-                            sleep(10)
+                            time.sleep(10)
             break
         else:
-            sleep(2)
+            time.sleep(2)
 
 # LMS install
 ##lowimportance
@@ -419,7 +437,7 @@ def setup_install(lmsdata):
     d = dict()
     d['error'] = False
     check_loop = 0
-    sleep(5)
+    time.sleep(5)
     if ( check_loop>69):
       d['error'] = True
       d['msg'] = "Timeout on page loading"
@@ -432,10 +450,10 @@ def setup_install(lmsdata):
             print ("Setting Lanuage")
             browser.find_element_by_xpath("//select[@id='langselect']/option[text()='English (en)']").click()
             browser.find_element_by_xpath('//*[@id="nextbutton"]').click()
-            sleep(5)
+            time.sleep(5)
             break
         else:
-            sleep(2)
+            time.sleep(2)
             check_loop = check_loop + 1
 
     if ( check_loop>69):
@@ -454,12 +472,12 @@ def setup_install(lmsdata):
                 datafolder_path.send_keys(Keys.BACK_SPACE)
             datafolder_path.send_keys('totara_data')
             browser.find_element_by_xpath('//*[@id="nextbutton"]').click()
-            sleep(5)
+            time.sleep(5)
             if (re.search("alert-error", browser.page_source)): #First error handeling to this :( script
               return "error"
             break
         else:
-            sleep(2)
+            time.sleep(2)
             check_loop = check_loop + 1
 
     #Set DB driver
@@ -476,7 +494,7 @@ def setup_install(lmsdata):
             browser.find_element_by_xpath('//*[@id="nextbutton"]').click()
             break
         else:
-            sleep(2)
+            time.sleep(2)
             check_loop = check_loop + 1
     #Set DB creds
 #dbname,dbuser,dbpass
@@ -493,14 +511,14 @@ def setup_install(lmsdata):
             db_pass.clear()
             db_pass.send_keys(lmsdata['db']['pass'])
             browser.find_element_by_xpath('//*[@id="nextbutton"]').click()
-            sleep(5)
+            time.sleep(5)
             if (re.search("alert-error", browser.page_source) or re.search("alert-danger", browser.page_source)): #First error handeling to this :( script20      d['error'] = True
               d['msg']   = "Error found on screen"
               d['error'] = True
               return d
             break
         else:
-            sleep(2)
+            time.sleep(2)
             check_loop = check_loop + 1
     #wait till page loads
     if ( check_loop>69):
@@ -515,7 +533,7 @@ def setup_install(lmsdata):
             browser.find_element_by_xpath('//*[@type="submit"]').click()
             break
         else:
-            sleep(2)
+            time.sleep(2)
             check_loop = check_loop + 1
     #Checking server checks
     if ( check_loop>69):
@@ -550,11 +568,11 @@ def setup_install(lmsdata):
                         break
                     else:
                         print ("Wating to carry on")
-                        sleep(5)
+                        time.sleep(5)
                         check_loop = check_loop + 1
             break
         else:
-          sleep(2)
+          time.sleep(2)
           check_loop = check_loop + 1
     ##Wating for install to complete
         if ( check_loop>69):
@@ -591,7 +609,7 @@ def setup_install(lmsdata):
                 return d
             break
         else:
-            sleep(2)
+            time.sleep(2)
             check_loop = check_loop + 1
     #setLMS name
     if ( check_loop>69):
@@ -610,10 +628,10 @@ def setup_install(lmsdata):
             site_shortname.clear()
             site_shortname.send_keys(lmsdata['site']['shortname'])
             browser.find_element_by_class_name("form-submit").click()
-            sleep(10)
+            time.sleep(10)
             break
         else:
-            sleep(2)
+            time.sleep(2)
             check_loop = check_loop + 1
     if ( check_loop>69):
       d['error'] = True
@@ -632,11 +650,11 @@ def setup_install(lmsdata):
                     print ("Totara Been registred")
                     break
                 else:
-                    sleep(2)
+                    time.sleep(2)
                     sub_check_loop = sub_check_loop + 1
             break
         else:
-            sleep(2)
+            time.sleep(2)
             check_loop = check_loop + 1
     return d
 
@@ -673,7 +691,7 @@ def modify_addusers(lmsdata):
                     break
             break
         else:
-            sleep(2)
+            time.sleep(2)
             check_loop = check_loop + 1
     return d
 
@@ -703,11 +721,11 @@ def modify_settheme(lmsurl,themename):
                                             break
                     break
                 else:
-                    sleep(2)
+                    time.sleep(2)
                     check_loop = check_loop + 1
             break
         else:
-            sleep(2)
+            time.sleep(2)
             check_loop = check_loop + 1
 
 def modify_setadmin(lmsdata):
@@ -716,9 +734,9 @@ def modify_setadmin(lmsdata):
     select = Select(browser.find_element_by_xpath('//*[@id="addselect"]'))
     select.select_by_visible_text(''+lmsdata['first']+' '+lmsdata['last']+'(lnadmin) ('+lmsdata['username']+', '+lmsdata['email']+')')
     browser.find_element_by_xpath('//*[@id="add"]').click()
-    sleep(4)
+    time.sleep(4)
     browser.find_element_by_xpath('//*[@type="submit" and @value="Continue"]').click()
-    sleep(5)
+    time.sleep(5)
 
 def modify_antivirus(lmsdata):
     print("Set clamv")
@@ -753,17 +771,17 @@ def modify_antivirus(lmsdata):
         #        browser.find_element_by_xpath("//select[@id='id_s_antivirus_clamav_runningmethod']/option[text()='Unix domain socket']").click()
                 if (pathtounixsocket == False and pathtoclam_orset == False):
                     browser.find_element_by_class_name("form-submit").click()
-                    sleep(2)
+                    time.sleep(2)
                     check_loop=0
                     while( check_loop<70):
                         if (re.search('Changes saved', browser.page_source)):
                             break
                         else:
-                            sleep(2)
+                            time.sleep(2)
                             check_loop = check_loop + 1
                 break
             else:
-                sleep(2)
+                time.sleep(2)
 
 
 
