@@ -82,7 +82,9 @@ def pull(lmsdata):
         current_path = lmsdata["currentlmspath"] + '/mod/certificate/type/'
         plugin_path = lmsdata["pluginspath"] + '/mod/certificate/type/'
         mod_path = topath + '/mod/certificate/type/'
+
         glfun.copyDirectory(current_path, mod_path)
+
         #need top copy to frompath with extras
         glfun.copyDirectory(topath, frompath+"-pulldlms")
 
