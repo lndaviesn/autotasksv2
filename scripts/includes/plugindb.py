@@ -63,7 +63,7 @@ new=[
 {"name":"mod_riskassessment","media":"git","repo":"ssh://git@github.com/LearningNexus/mod_riskassessment.git","branch":"2016120500","lmsversion":"10","path":"mod/"},
 {"name":"mod_riskassessment","media":"git","repo":"ssh://git@github.com/LearningNexus/mod_riskassessment.git","branch":"2015111602","lmsversion":"9","path":"mod/"},
 
-{"name":"local_totara_sync_helper_ftps","media":"git","repo":"ssh://git@github.com/LearningNexus/local_totara_sync_helper_ftps.git","branch":"2020120200","lmsversion":"12","path":"local/"},
+{"name":"local_totara_sync_helper_ftps","media":"git","repo":"ssh://git@github.com/LearningNexus/local_totara_sync_helper_ftps.git","branch":"2021022500","lmsversion":"12","path":"local/"},
 {"name":"local_totara_sync_helper_ftps","media":"git","repo":"ssh://git@github.com/LearningNexus/local_totara_sync_helper_ftps.git","branch":"2019031501","lmsversion":"11","path":"local/"},
 {"name":"local_totara_sync_helper_ftps","media":"git","repo":"ssh://git@github.com/LearningNexus/local_totara_sync_helper_ftps.git","branch":"2019031501","lmsversion":"10","path":"local/"},
 {"name":"local_totara_sync_helper_ftps","media":"git","repo":"ssh://git@github.com/LearningNexus/local_totara_sync_helper_ftps.git","branch":"2019031500","lmsversion":"9","path":"local/"},
