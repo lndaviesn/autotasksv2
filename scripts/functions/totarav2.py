@@ -76,6 +76,35 @@ def login(lguser,lgpass):
             time.sleep(2)
 
 #Upgrade
+##Confirm Upgrade
+def upgrade_confirm():
+    try:
+        w = WebDriverWait(browser, 120)
+        w.until(EC.title_contains('Administration'))
+        w.until(EC.visibility_of_element_located((By.XPATH, "//*[@class='buttons']")))
+        print ("Make sure the version is correct and Press the Continue buttion")
+        w = WebDriverWait(browser, 180)
+        w.until(EC.title_contains('Current release information'))
+        return True
+    except TimeoutException:
+        print ("Timeout finding the page or pressing the buttion to Continue")
+        return False
+
+def upgrade_witing():
+    try:
+        w = WebDriverWait(browser, 150)
+        if (w.until(EC.title_contains('Upgrading to new version'))):
+            print ("Wating for upgrade to complete")
+            w = WebDriverWait(browser, 500)
+            a_test = w.until(EC.visibility_of_element_located((By.XPATH, "//*[@class='continuebutton']")))
+            if (a_test):
+                browser.execute_script("window.scrollTo(0,document.body.scrollHeight)")
+                return True
+    except TimeoutException:
+        return False
+
+
+
 ##enter upgradkey
 def upgrade_upgradekey(lms_site,upkey):
     browser.get(lms_site+'/admin/index.php')
@@ -92,14 +121,17 @@ def upgrade_upgradekey(lms_site,upkey):
             time.sleep(2)
             check_loop = check_loop +1
 
-def upgrade_goon_buttion(value_text):
-        try:
-            wait = WebDriverWait(browser, 630, poll_frequency=10, ignored_exceptions=[ElementNotVisibleException, ElementNotSelectableException])
-            wait.until(EC.element_to_be_clickable((By.XPATH, '//input[@value="'+value_text+'" and @type="submit"]'))).click()
-        except Exception as e:
-            print ("Somthing happened")
-            browser.refresh()
-            time.sleep(10)
+def update_carryon(btext,timeout):
+    try:
+        w = WebDriverWait(browser, int(timeout))
+        w.until(EC.visibility_of_element_located((By.XPATH, '//*[@type="submit" and @value="'+btext+'"]')))
+        browser.find_element_by_xpath('//*[@type="submit" and @value="'+ btext +'"]').click()
+        return True
+    except TimeoutException:
+        print ("Error timeout looking for buttion")
+        return False
+
+
 #Checks
 #version number
 def check_version(lms_site):
@@ -115,30 +147,6 @@ def check_version(lms_site):
         fullversion['error'] = True
         fullversion['errormsg'] = "Cant find version number"
     return fullversion
-
-#to monitor when the upgrade is done
-def check_upgardeprogs():
-    upgans = False
-    check_loop=0
-    print ("Wating for Upgrade to complete")
-    wait = WebDriverWait(browser, 240, poll_frequency=1, ignored_exceptions=[ElementNotVisibleException, ElementNotSelectableException, TimeoutException])
-    try:
-        print("next-level")
-        if (wait.until(EC.presence_of_element_located((By.TAG_NAME, 'title')))):
-            print ("found title")
-            if (wait.until(EC.title_contains('Upgrading to new version'))):
-                print ("on the page")
-                if (wait.until(EC.presence_of_element_located((By.CLASS, 'continuebutton')))):
-                    print ("Found the buttion class")
-                    upgans = True
-    except TimeoutException as ex:
-        repans = input("Upgrade has errord or timed out do you wish to carry on [Y/n]: ")
-        if (repans == 'Y' or repans == 'y'):
-            upgans = True
-        else:
-            upgans = False
-        return upgans
-
 
 ##Check all plugins ae correct
 def check_plugins(lms_site):
