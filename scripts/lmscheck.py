@@ -58,13 +58,13 @@ if res['counts']['err'] > 0:
         print (isse)
     sys.exit("These need to be looked in to")
 else:
-    if res['counts']['warn'] > 1:
+    if res['counts']['warn'] > 2:
         print("Some LMS security Warining have been found")
         testres = False
         for isse in res['issues_n']:
             print (isse)
     else:
-        print ("Checks reported " + res['counts']['ok'] + " as ok" + res['counts']['warn'] + " as warnings and " + res['counts']['err'] + " with erros")
+        print ("--Checks reported--\n" + str(res['counts']['ok']) + " checks as ok\n" + str(res['counts']['warn']) + " checks as warnings \n" + str(res['counts']['err']) + " checks as erros")
 
 res = totara.check_envextra(url)
 if res['finalcheck'] == False:
@@ -73,6 +73,7 @@ if res['finalcheck'] == False:
     sys.exit("An issue was found with Php")
 
 if testres == True:
+    totara.set_maintenancemode(url,'Disable')
     totara.close()
     print ("All Tests came out clear")
 else:
