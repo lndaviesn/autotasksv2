@@ -64,7 +64,14 @@ else:
         for isse in res['issues_n']:
             print (isse)
     else:
-        print ("--Checks reported--\n" + str(res['counts']['ok']) + " checks as ok\n" + str(res['counts']['warn']) + " checks as warnings \n" + str(res['counts']['err']) + " checks as erros")
+        print ("--Checks reported--")
+        print (str(res['counts']['ok']) + " checks as ok")
+        print (str(res['counts']['warn']) + " checks as warnings")
+        print (str(res['counts']['err']) + " checks as erros")
+        if (res['counts']['warn'] > 0 or res['counts']['err'] > 0):
+            for isse in res['issues_n']:
+                print (isse)
+        print ("-------------------")
 
 res = totara.check_envextra(url)
 if res['finalcheck'] == False:
