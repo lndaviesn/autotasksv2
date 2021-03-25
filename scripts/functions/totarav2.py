@@ -321,22 +321,26 @@ def set_maintenancemode(lms_site,maiopt):
     check_loop=0
     while( check_loop<70):
         if (re.search('page-admin-setting-maintenancemode', browser.page_source)):
-            if (re.search('<option value="1" selected="selected">Enable</option>', browser.page_source) and maiopt == 'Enable'  or re.search('<option value="1" selected="selected">Disable</option>', browser.page_source) and maiopt == 'Disable'):
-                print ("matiance is oready set as " + maiopt)
-                break
+            drpCountry = Select(browser.find_element_by_xpath('//*[@name="s__maintenance_enabled"]'))
+            if (drpCountry.first_selected_option.text == maiopt ):
+                print ("Matiance is oready set as " + maiopt)
             else:
+                print ("Setting matiance as " + maiopt)
                 browser.find_element_by_xpath("//select[@id='id_s__maintenance_enabled']/option[text()='"+maiopt+"']").click()
                 browser.find_element_by_xpath('//*[@type="submit" and @value="Save changes"]').click()
-        check_loop=0
-        while( check_loop<70):
-            if (re.search('Changes saved', browser.page_source)):
-                break
-            else:
-                time.sleep(2)
+                print ("Saving changes")
+                check_loop_2 = 0
+                while( check_loop_2<70):
+                    if (re.search('Changes saved', browser.page_source)):
+                        break
+                    else:
+                        check_loop_2 = check_loop_2 + 1
+                        time.sleep(2)
         else:
+            check_loop = check_loop +1
             time.sleep(2)
-        break
 
+        break
 
 
 ##Disables content market
