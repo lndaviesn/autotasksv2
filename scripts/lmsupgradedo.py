@@ -109,7 +109,11 @@ if (versplit['error'] == False):
 else:
     sys.exit(versplit['errormsg'])
 ###Before-upgrade
-#totara.purgecache(url,ver_major)
+#Login to webserver
+print ("LMS info")
+print ("--> Server Address: " + data['lmsserver_address'])
+print ("--> Domain Address: " + data['lmsaddress'])
+
 #Place site in to matiance mode
 totara.set_maintenancemode(url,'Enable')
 
@@ -137,55 +141,61 @@ else:
 ###After-upgrade of files
 #enter upgrade key if have
 try:
-    print ("Upgrade key: Found -> " + data['lmsettings']['config']['upgradekey'] +" <-" )
-    dhold = input("Press enter when upgrade been done and at upgradekey")
-    totara.upgrade_upgradekey(url,data['lmsettings']['config']['upgradekey'])
+    if (data['lmsettings']['config']['upgradekey'] == "null"):
+        print ("no LMS upgradkey retrived")
+        repans = input("Press enter when upgrade the files on server")
+    else:
+        print ("Upgrade key: Found -> " + data['lmsettings']['config']['upgradekey'] +" <-" )
+        repans = input("Press enter when upgrade the files on server")
+        totara.upgrade_upgradekey(url,data['lmsettings']['config']['upgradekey'])
+
 except KeyError:
     print ("no LMS upgradkey retrived")
-    dhold = input("Press enter when upgrade been done")
-print ("Upgrade")
-##confirm install link
-if (opt_nocontinue == True):
-    totara.upgrade_goon_buttion("Continue")
-else:
-    print ("You need to manualy click on 'Continue' buttion")
-#After pressing the confirm link
-##CHeck server vars and plugins have no issues
-print ("-->Checking")
+    repans = input("Press enter when upgrade the files on server")
+##After
+print ("Approving upgrade request")
+totara.upgrade_confirm()
+print ("-->Running checks")
 res = totara.check_envextra("nourl")
 if (res['finalcheck'] == True):
     print ("--->Server Checks are fine")
-    if (opt_nocontinue == True):
-        totara.upgrade_goon_buttion("Continue")
+    if (opt_nocontinue is True):
+        if (totara.update_carryon("Continue","120") is False):
+            repans = input("Somthing gone wrong press enter to carry on")
+            print ("ok carrying on")
     else:
-        print ("You need to manualy click on 'Continue' buttion")
+        print ("press the Contuniue buttion")
 else:
-    print("looks to be an issue with server checks")
+    print("--->looks to be an issue with server checks")
+
 res = totara.check_plugins("nourl")
 if (res['finalcheck'] == True):
     print ("--->Plugins Checks are fine")
-    print ("-->Started")
-    if (opt_nocontinue == True):
-        totara.upgrade_goon_buttion("Upgrade Totara database now")
+    print ("-->Upgrade")
+    print ("--->Starting")
+    if (opt_nocontinue is True):
+        if (totara.update_carryon("Upgrade Totara database now","90000") is False):
+            print ("Time out happend (know to happen to upgrade taking longer)")
+            if (totara.upgrade_witing() is True):
+                print ("--->Compleated")
+                repans = input("Press enter to move to the next stage")
+            else:
+                print ("Somtihng went wrong")
+        else:
+            if (totara.upgrade_witing() is True):
+                print ("-->Upgrade Compleated")
+                repans = input("Press enter to move to the next stage")
+            else:
+                print ("Somtihng went wrong")
     else:
-        print ("You need to manualy click on 'Upgrade Totara database now' buttion")
+        print ("press the Contuniue buttion")
 else:
-    print("looks to be an issue with plugins")
-time.sleep(5)
-#Check upgrade in progoss
-upans = totara.check_upgardeprogs()
-print (upans)
-if ( upans == True):
-    print ("-->Completed")
-    if (opt_nocontinue == True):
-        totara.upgrade_goon_buttion("Continue")
-    else:
-        print ("You need to manualy click on 'Continue' buttion")
-
+    print("--->looks to be an issue with plugin checks")
+    repans = input("Press enter to move to the next stage")
 ##Found that may need to reloagin
+print ("Check and disable/enable or change settings required")
 totara.login(decryt(data['lmsserver_user']),decryt(data['lmsserver_pass']))
 time.sleep(5)
-
 ##Get new version number
 versplit = totara.check_version(url)
 print ("Updating Version number")
@@ -233,35 +243,8 @@ if (opt_rcheck == True and opt_rnodiff == True):
 else:
     print("Reporting Checking Disabled")
 
-## Run lmschanges
-print ("LMS Mods")
-if (int(ver_major) >= 10):
-    print ("-->Disabling Content Market")
-    totara.disable_content_market(url,ver_major)
-    print ("--->Compleated")
-
-#Clear cache
-if (int(ver_major) >= 9):
-    print ("-->Purging Cache")
-    totara.purgecache(url,ver_major)
-    print ("--->Compleated")
-
-if (int(ver_major) >= 12):
-    print ("->Hiding Course navigation")
-    totara.hideblock(url,'Course navigation')
-    print ("--->Completed")
-
-##Check if the LMS is ok and if so disable
-if (opt_cronwait == True):
-    dhold = input("Please re-enable cron service and press enrter to carry on")
-    print ("Wating 2 minutes")
-    time.sleep(240)
-else:
-    print ("Cron wait disabled")
-#disable matiance mode
-totara.set_maintenancemode(url,'Disable')
-
 if (opt_notoclose == True):
+    print ("-->Closing Browser")
     totara.close()
 else:
     print ("Close of browser disabled")
