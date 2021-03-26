@@ -1,0 +1,4 @@
+lmsrepor={}
+lmsrepor['13'] = '' #git path for totara 13
+lmsrepor['<12'] = '' #git path for totara 9 to 12
+lmsrepor['localloc'] = '' # local location for zip files downloaded from totara site
