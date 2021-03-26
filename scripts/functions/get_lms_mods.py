@@ -4,9 +4,8 @@ import os, shutil, sys, tempfile, zipfile, glob
 from git import Repo
 from git import Git
 import includes.modsdb as modsdb
-lms_mods_store = modsdb.lms_mods_store_path
 import functions.globalfun as glfun
-
+lms_mods_store = modsdb.lms_mods_store_path
 
 #rebuild with mutple defs
 def pull(lmsdata):
