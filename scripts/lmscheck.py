@@ -84,5 +84,6 @@ if testres == True:
     totara.close()
     print ("All Tests came out clear")
 else:
+    totara.set_maintenancemode(url,'Disable')
     totara.close()
-    print ("Some tests shows some issues but nothing to stop LMS running")
+    print ("!!!Some tests shows some issues but nothing to stop LMS running!!!")
