@@ -3,4 +3,5 @@ functions/__pycache__/*
 includes/__pycache__/*
 includes/installdb.py
 includes/modsdb.py
+includes/corelms.py
 includes/firefox.profile
