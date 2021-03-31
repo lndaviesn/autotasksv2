@@ -7,7 +7,7 @@ from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import *
-import re, string, random, mmap, os, time
+import re, string, random, mmap, os, time, datetime, pytz
 #Basics
 
 ##Loads the webpage
@@ -133,6 +133,36 @@ def update_carryon(btext,timeout):
 
 
 #Checks
+def check_scheduledtasks(lms_site):
+    browser.get(lms_site+'/admin/tool/task/scheduledtasks.php')
+    w = WebDriverWait(browser, 120)
+    w.until(EC.title_contains('Scheduled tasks'))
+    time.sleep(2)
+    table_id = browser.find_element_by_xpath('//*[@class="admintable generaltable"]')
+    table_body = table_id.find_elements_by_tag_name("tbody")
+    for body in table_body:
+        body_tr = body.find_elements_by_tag_name("tr")
+        for tr in body_tr:
+            if (re.search('\*/5 \* \* \*', tr.text)):
+                time_now = datetime.datetime.now()
+                time_zon = time_now.astimezone(pytz.timezone("Europe/London"))
+                cur_time = time_zon.replace(tzinfo=None)
+                jobn_ame = tr.find_element_by_xpath('//*[@class="cell c0"]').text.split("\n")
+                last_run = tr.find_element_by_xpath('//*[@class="cell c3"]')
+                next_run = tr.find_element_by_xpath('//*[@class="cell c4"]')
+                last_run_date_time_obj = datetime.datetime.strptime(str(last_run.text), '%A, %d %B %Y, %I:%M %p')
+                if (next_run.text == "ASAP"):
+                    print ("Checking: " + str(jobn_ame[0]))
+                    print ("Datenow -> " + str(cur_time) + "\nLastrun -> " + str(last_run_date_time_obj) + "\nnextrun -> way longer then 5 minutes(ASAP) ")
+                else:
+                    next_run_date_time_obj = datetime.datetime.strptime(str(next_run.text), '%A, %d %B %Y, %I:%M %p')
+                    time_delta = (next_run_date_time_obj - cur_time)
+                    print ("Checking: " + str(jobn_ame.text))
+                    print ("Datenow -> " + str(cur_time) + "\nLastrun -> " + str(last_run_date_time_obj) + "\nnextrun -> " + str(next_run_date_time_obj))
+                    print ("Time Differance -> " + str(time_delta))
+
+
+
 #version number
 def check_version(lms_site):
     fullversion={}
@@ -347,10 +377,15 @@ def set_maintenancemode(lms_site,maiopt):
 def disable_content_market(lms_site,lms_version):
     if (lms_version >= "11"):
 #optionalsubsystems
-        browser.get(lms_site+'/admin/settings.php?section=optionalsubsystems')
+        if (lms_version >= "13"):
+            browser.get(lms_site+'/admin/settings.php?section=advancedfeatures_learn')
+            stringmatch="<h2>Learn settings</h2>"
+        else:
+            browser.get(lms_site+'/admin/settings.php?section=optionalsubsystems')
+            stringmatch="<h2>Advanced features</h2>"
         check_loop=0
         while( check_loop<70):
-            if (re.search('<h2>Advanced features</h2>', browser.page_source)):
+            if (re.search(stringmatch, browser.page_source)):
                 #enablecontentmarketplaces
                 if (browser.find_element_by_xpath('//*[@type="checkbox" and @name="s__enablecontentmarketplaces"]').is_selected() == True):
                     browser.find_element_by_xpath('//*[@type="checkbox" and @name="s__enablecontentmarketplaces"]').click()
