@@ -7,20 +7,6 @@ import includes.plugindb as plugindb
 import functions.globalfun as glfun
 from distutils.dir_util import copy_tree
 
-###############################
-def copyDirectory(src, dest):
-    try:
-        copy_tree(src, dest)
-    # Directories are the same
-    except shutil.Error as e:
-        sys.exit('Directory not copied. Error: %s' % e)
-    # Any error saying that the directory doesn't exist
-    except OSError as e:
-        sys.exit('Directory not copied. Error: %s' % e)
-
-#########################################
-
-
 def pull(plugindata, lmsdata):
     plugin_found = False
     print ("Looking for " + plugindata['pluginname'])
@@ -28,10 +14,13 @@ def pull(plugindata, lmsdata):
     for x in plugindb.paths:
         if x['name'] == plugindata['pluginname']:
             print ("Found and coping now")
-            copyingfrom = lmsdata["currentlmspath"] + "/" + x['path']
+            if (lmsdata['version_major'] == "13"):
+                copyingfrom = lmsdata["currentlmspath"] + "/server/" + x['path']
+            else:
+                copyingfrom = lmsdata["currentlmspath"] + "/" + x['path']
             copyingto = lmsdata["pluginspath"] + "/" + x['path']
             try:
-                copyDirectory(copyingfrom, copyingto)
+                glfun.copyDirectory(copyingfrom, copyingto)
             except Exception as e:
                 plugin_found == False
                 sys.exit("Somthing happend " + e)
@@ -86,7 +75,7 @@ def get(plugindata, lmsdata):
                     glfun.gitclear(repofolder)
                     copyingfrom = gitdump + "/" + x['path']
                     copyingto = lmsdata["pluginspath"] + "/" + x['path']
-                    copyDirectory(copyingfrom, copyingto)
+                    glfun.copyDirectory(copyingfrom, copyingto)
                 except Exception as e:
                     plugin_found == False
                     sys.exit("Somthing happend " + e)
