@@ -5,7 +5,7 @@ import cryptography
 from cryptography.fernet import Fernet
 import os, shutil, sys, glob, tempfile, json
 from os.path import basename
-from time import sleep
+import time
 import functions.gpg as gpg
 
 spath = os.getcwd()
@@ -35,6 +35,26 @@ def decryt(encval):
     decrypted = decrypted.decode()
     return decrypted
 
+def croncheck():
+    sch_check = totara.check_scheduledtasks(url)
+    listc=0
+    checkc = False
+    while (listc <len(sch_check)):
+        for chk in sch_check:
+            if (chk['check_goov'] == False):
+                checkc = True
+            else:
+                checkc = false
+            listc = listc + 1
+    if (checkc == True):
+        return True
+    else:
+        return False
+
+
+
+
+
 print ("I am just doing some LMS checks, just to be safe")
 
 global browser
@@ -48,15 +68,15 @@ res = totara.check_plugins(url)
 if res['finalcheck'] == False:
     totara.maxerr()
     testres = False
-    sys.exit("An issue was found with plugins")
+    sys.exit("!!An issue was found with plugins!!")
 
 res = totara.check_security(url)
 if res['counts']['err'] > 0:
     testres = False
-    print("Some LMS security Warining have been found")
+    print("Some LMS security Erros have been found")
     for isse in res['issues_n']:
         print (isse)
-    sys.exit("These need to be looked in to")
+    sys.exit("!!These need to be looked in to before carrying on!!")
 else:
     if res['counts']['warn'] > 2:
         print("Some LMS security Warining have been found")
@@ -71,13 +91,37 @@ else:
         if (res['counts']['warn'] > 0 or res['counts']['err'] > 0):
             for isse in res['issues_n']:
                 print (isse)
-        print ("-------------------")
 
 res = totara.check_envextra(url)
+print ("--Checking server requirments--")
 if res['finalcheck'] == False:
     totara.maxerr()
     testres = False
-    sys.exit("An issue was found with Php")
+    sys.exit("!!An issue was found with Server settings!!")
+else:
+    print("No issues found")
+
+print ("--Checking scheduled tasks--")
+if (croncheck() == True):
+    print ("Scheduled tasks are running")
+    testres = True
+else:
+    print ("Scheduled tasks may not running")
+    print ("Going to wait 5 mins and try again")
+    #added the time part just so it dont look like an hung screen as 5mins is long
+    time.sleep(240)
+    print ("60 Seconds left")
+    time.sleep(30)
+    print ("30 Seconds left")
+    time.sleep(30)
+    if (croncheck() == True):
+        print ("Scheduled tasks are running")
+        testres = True
+    else:
+        testres = False
+        sys.exit("!!Scheduled tasks check failed need to check!!")
+
+
 
 if testres == True:
     totara.set_maintenancemode(url,'Disable')

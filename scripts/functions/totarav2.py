@@ -134,6 +134,10 @@ def update_carryon(btext,timeout):
 
 #Checks
 def check_scheduledtasks(lms_site):
+    cron_list = []
+    time_now = datetime.datetime.now().replace(microsecond=0)
+    time_zon = time_now.astimezone(pytz.timezone("Europe/London"))
+    cur_time = time_zon.replace(tzinfo=None)
     browser.get(lms_site+'/admin/tool/task/scheduledtasks.php')
     w = WebDriverWait(browser, 120)
     w.until(EC.title_contains('Scheduled tasks'))
@@ -142,26 +146,27 @@ def check_scheduledtasks(lms_site):
     table_body = table_id.find_elements_by_tag_name("tbody")
     for body in table_body:
         body_tr = body.find_elements_by_tag_name("tr")
-        for tr in body_tr:
-            if (re.search('\*/5 \* \* \*', tr.text)):
-                time_now = datetime.datetime.now()
-                time_zon = time_now.astimezone(pytz.timezone("Europe/London"))
-                cur_time = time_zon.replace(tzinfo=None)
-                jobn_ame = tr.find_element_by_xpath('//*[@class="cell c0"]').text.split("\n")
-                last_run = tr.find_element_by_xpath('//*[@class="cell c3"]')
-                next_run = tr.find_element_by_xpath('//*[@class="cell c4"]')
-                last_run_date_time_obj = datetime.datetime.strptime(str(last_run.text), '%A, %d %B %Y, %I:%M %p')
-                if (next_run.text == "ASAP"):
-                    print ("Checking: " + str(jobn_ame[0]))
-                    print ("Datenow -> " + str(cur_time) + "\nLastrun -> " + str(last_run_date_time_obj) + "\nnextrun -> way longer then 5 minutes(ASAP) ")
+        for trs in body_tr:
+            task_ls = {}
+            if (re.search('\*/5 \* \* \*', trs.text)):
+                check_name = trs.find_element_by_xpath('th[@class="cell c0"]').text.split("\n")
+                check_last = trs.find_element_by_xpath('td[@class="cell c3"]').text
+                check_next = trs.find_element_by_xpath('td[@class="cell c4"]').text
+                check_last_date_time_obj = datetime.datetime.strptime(check_last, '%A, %d %B %Y, %I:%M %p')
+                task_ls['name'] = check_name[0]
+                task_ls['check_last'] = str(check_last_date_time_obj)
+                if (check_next == "ASAP"):
+                    task_ls['check_next'] = check_next
+                    task_ls['check_goov'] = True
+                    cron_list.append(task_ls)
                 else:
-                    next_run_date_time_obj = datetime.datetime.strptime(str(next_run.text), '%A, %d %B %Y, %I:%M %p')
-                    time_delta = (next_run_date_time_obj - cur_time)
-                    print ("Checking: " + str(jobn_ame.text))
-                    print ("Datenow -> " + str(cur_time) + "\nLastrun -> " + str(last_run_date_time_obj) + "\nnextrun -> " + str(next_run_date_time_obj))
-                    print ("Time Differance -> " + str(time_delta))
-
-
+                    check_next_date_time_obj = datetime.datetime.strptime(check_next, '%A, %d %B %Y, %I:%M %p')
+                    task_ls['check_next'] = str(check_next_date_time_obj)
+                    time_delta = (check_next_date_time_obj - cur_time)
+                    task_ls['time_delta'] = str(time_delta)
+                    task_ls['check_goov'] = False
+                    cron_list.append(task_ls)
+                return cron_list
 
 #version number
 def check_version(lms_site):
@@ -393,7 +398,7 @@ def disable_content_market(lms_site,lms_version):
                     browser.find_element_by_xpath('//*[@type="submit" and @class="form-submit" and @value="Save changes"]').click()
                     check_loop=0
                     while( check_loop<70):
-                        if (re.search('<h2>Advanced features</h2>', browser.page_source)):
+                        if (re.search(stringmatch, browser.page_source)):
                             break
                         else:
                             time.sleep(2)
