@@ -1,14 +1,12 @@
 #!/usr/bin/env python
 import json, os, shutil, glob, tempfile, zipfile, sys
-from git import Repo
-from git import Git
 from time import sleep
 import functions.get_lms_plugins as lmsplugins
 import functions.get_lms_mods as lmsmods
 import functions.totara_config as totara_config
 import functions.globalfun as glfun
 import includes.corelms as corelms
-
+import functions.get_lms_core as getlms
 
 lmsdata={}
 spath = os.getcwd()
@@ -124,32 +122,36 @@ lmsmods.pull(lmsdata)
 repotag = "totara-"+ lmsdata["version"]
 repofolder = lmsdata["newlmspath"]
 zippath=lmsdata["lmslocalstore"]+"/"+ repotag +".zip"
-if (os.path.isfile(zippath) == True):
-    print ("If found will take from theit and insted")
-    print ("And then unzip the file")
-    print ("And place it in to the repo location")
-    zipcmd = 'unzip ' + zippath + ' -d ' + lmsdata["tmpfolder"] + '> /dev/null'
-    os.system(zipcmd)
-    for lmsfname in glob.glob(lmsdata["tmpfolder"]+'/totaralearn-'+lmsdata["version"]):
-        #found an issue where zip file as an folder in it again :(
-        lmsfolder=lmsdata["tmpfolder"]+'/totaralearn-'+lmsdata["version"]+'/totaralearn-'+lmsdata["version"]
-        os.rename(lmsfolder, repofolder)
-    for lmsfname in glob.glob(lmsdata["tmpfolder"]+'/totaratxp-'+lmsdata["version"]):
-        lmsfolder=lmsdata["tmpfolder"]+'/totaratxp-'+lmsdata["version"]+'/totaratxp-'+lmsdata["version"]
-        os.rename(lmsfolder, repofolder)
 
+##Get the core LMS
+print ("Getting Core LMS files")
+if (int(lmsdata["version_major"]) <= 12):
+    #getting versions 9 to 12
+    if (glob.glob(corelms.lmsrepor['localloc'] +"/totaralearn-"+str(lmsdata["version"])+".tar.gz")):
+        print ("found Pulling from local store")
+        lmsfile = corelms.lmsrepor['localloc'] +"/totaralearn-"+str(lmsdata["version"])+".tar.gz"
+        getlms.get_file(lmsfile,lmsdata["tmpfolder"])
+        os.rename(lmsdata["tmpfolder"]+"/totaralearn-"+str(lmsdata["version"]),lmsdata["tmpfolder"]+"/newlms")
+    else:
+        print ("Getting from Totara Git repo")
+        giturl = corelms.lmsrepor['<12']
+        base = "totara-"+ lmsdata["version"]
+        getlms.get_git(giturl,base,lmsdata["tmpfolder"])
+        os.rename(lmsdata["tmpfolder"]+"/totara-"+str(lmsdata["version"]),lmsdata["tmpfolder"]+"/newlms")
 
-
-
-else:
-    print ("Getting corelms using Git")
-    git_ssh_cmd = 'ssh -o StrictHostKeyChecking=no'
-    with Git().custom_environment(GIT_SSH_COMMAND=git_ssh_cmd):
-        gitrepo = Repo.clone_from(lmsdata["gitrepo"], repofolder, branch=repotag)
-    print ("Removing git folder")
-    glfun.gitclear(repofolder)
-    zipname = lmsdata["lmslocalstore"]+"/"+ repotag +".zip"
-    os.chdir(lmsdata["tmpfolder"])
+if (int(lmsdata["version_major"]) == 13):
+    #getting versions 13
+    if (glob.glob(corelms.lmsrepor['localloc'] +"/totaratxp-"+str(lmsdata["version"])+".tar.gz")):
+        print ("found Pulling from local store")
+        lmsfile = corelms.lmsrepor['localloc'] +"/totaratxp-"+str(lmsdata["version"])+".tar.gz"
+        getlms.get_file(lmsfile,lmsdata["tmpfolder"])
+        os.rename(lmsdata["tmpfolder"]+"/totaratxp-"+str(lmsdata["version"]),lmsdata["tmpfolder"]+"/newlms")
+    else:
+        print ("Getting from Git services")
+        giturl = corelms.lmsrepor['13']
+        base = "totara-"+ lmsdata["version"]
+        getlms.get_git(giturl,base,lmsdata["tmpfolder"])
+        os.rename(lmsdata["tmpfolder"]+"/totara-"+str(lmsdata["version"]),lmsdata["tmpfolder"]+"/newlms")
 
 
 

@@ -119,10 +119,26 @@ totara.set_maintenancemode(url,'Enable')
 
 #Ask user to disable cron service
 if (opt_cronwait == True):
-    dhold = input("Please disable cron service and press enrter to carry on")
-    #Wait 2 minutes
-    print ("Wating 2 minutes")
-    time.sleep(240)
+#    dhold = input("Please disable cron service and press enrter to carry on")
+    crondisable = False
+    while (crondisable == False):
+        sch_check = totara.check_scheduledtasks(url)
+        for chk in sch_check:
+            if chk['check_goov'] == True:
+                print ("Cron been disabled Confirmed")
+                crondisable = True
+            else:
+                print ("Cron not dsabled")
+                print ("Wating 1 minutes and will try again")
+                time.sleep(60)
+                time.sleep(30)
+                print ("30 seconds left")
+                time.sleep(30)
+                crondisable = False
+
+
+
+
 else:
     print ("Cronwait disabled")
     if (opt_rcheck == True):

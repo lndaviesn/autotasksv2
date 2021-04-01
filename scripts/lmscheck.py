@@ -44,7 +44,7 @@ def croncheck():
             if (chk['check_goov'] == False):
                 checkc = True
             else:
-                checkc = false
+                checkc = False
             listc = listc + 1
     if (checkc == True):
         return True
@@ -70,6 +70,7 @@ if res['finalcheck'] == False:
     testres = False
     sys.exit("!!An issue was found with plugins!!")
 
+print ("--Checking LMS Security--")
 res = totara.check_security(url)
 if res['counts']['err'] > 0:
     testres = False
@@ -119,6 +120,7 @@ else:
         testres = True
     else:
         testres = False
+        totara.close()
         sys.exit("!!Scheduled tasks check failed need to check!!")
 
 

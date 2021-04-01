@@ -131,7 +131,6 @@ def update_carryon(btext,timeout):
         print ("Error timeout looking for buttion")
         return False
 
-
 #Checks
 def check_scheduledtasks(lms_site):
     cron_list = []
@@ -152,9 +151,13 @@ def check_scheduledtasks(lms_site):
                 check_name = trs.find_element_by_xpath('th[@class="cell c0"]').text.split("\n")
                 check_last = trs.find_element_by_xpath('td[@class="cell c3"]').text
                 check_next = trs.find_element_by_xpath('td[@class="cell c4"]').text
-                check_last_date_time_obj = datetime.datetime.strptime(check_last, '%A, %d %B %Y, %I:%M %p')
+                if (check_last == "Never"):
+                    check_last = "Never"
+                    task_ls['check_last'] = "Never"
+                else:
+                    check_last_date_time_obj = datetime.datetime.strptime(check_last, '%A, %d %B %Y, %I:%M %p')
+                    task_ls['check_last'] = str(check_last_date_time_obj)
                 task_ls['name'] = check_name[0]
-                task_ls['check_last'] = str(check_last_date_time_obj)
                 if (check_next == "ASAP"):
                     task_ls['check_next'] = check_next
                     task_ls['check_goov'] = True
