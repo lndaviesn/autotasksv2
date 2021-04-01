@@ -12,11 +12,10 @@ def get_file(lmsfile,extratpath):
     tar.extractall(extratpath)
     tar.close()
 
-
 def get_git(giturl,base,repoloc):
     extratpath = repoloc + "/"+ base
     git_ssh_cmd = 'ssh -o StrictHostKeyChecking=no'
     with Git().custom_environment(GIT_SSH_COMMAND=git_ssh_cmd):
         gitrepo = Repo.clone_from(giturl, extratpath, branch=base)
-    print ("Removing git folder")
+    print ("Removing git folders")
     glfun.gitclear(extratpath)
