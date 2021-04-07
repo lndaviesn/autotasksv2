@@ -45,15 +45,13 @@ def login(lguser,lgpass):
             #check if their is any lick to login page links
             try:
                 browser.find_element_by_xpath('//*[@class="showLogin"]').click()
-                time.sleep(2)
             except Exception as e:
                 loginckh = False
             try:
                 browser.find_element_by_xpath('//*[@id="togglelogin"]').click()
-                time.sleep(2)
             except Exception as e:
                 loginckh = False
-            #ok this where i login you see    
+            #ok this where i login you see
             try:
                 lg_username = browser.find_element_by_xpath('//*[@id="username"]')
                 lg_username.clear()
@@ -64,6 +62,7 @@ def login(lguser,lgpass):
                 browser.find_element_by_xpath('//*[@id="loginbtn"]').click()
             except Exception as e:
                 time.sleep(2)
+                print ("Error with login")
                 print (e)
             else:
                 break
@@ -71,8 +70,8 @@ def login(lguser,lgpass):
             if (re.search('id="page-site-index"', browser.page_source) or  re.search('class="usertext"', browser.page_source)):
                 print ("OR ready loged in")
                 break
+            print ("wating for page to load")
             time.sleep(2)
-    time.sleep(3)
     check_loop=0
     while( check_loop<70):
         if (re.search('id="page-site-index"', browser.page_source) or  re.search('class="usertext"', browser.page_source)):
