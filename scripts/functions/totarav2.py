@@ -39,8 +39,21 @@ def close():
 ##logins
 def login(lguser,lgpass):
     check_loop=0
+    loginckh=False
     while( check_loop<70):
         if (re.search('id="page-login-index"', browser.page_source)):
+            #check if their is any lick to login page links
+            try:
+                browser.find_element_by_xpath('//*[@class="showLogin"]').click()
+                time.sleep(2)
+            except Exception as e:
+                loginckh = False
+            try:
+                browser.find_element_by_xpath('//*[@id="togglelogin"]').click()
+                time.sleep(2)
+            except Exception as e:
+                loginckh = False
+            #ok this where i login you see    
             try:
                 lg_username = browser.find_element_by_xpath('//*[@id="username"]')
                 lg_username.clear()
@@ -52,16 +65,6 @@ def login(lguser,lgpass):
             except Exception as e:
                 time.sleep(2)
                 print (e)
-                try:
-                    browser.find_element_by_xpath('//*[@class="showLogin"]').click()
-                except Exception as e:
-                    time.sleep(5)
-                    print (e)
-                    try:
-                        browser.find_element_by_xpath('//*[@class="showlogin"]').click()
-                    except Exception as e:
-                        time.sleep(5)
-                        print (e)
             else:
                 break
         else:
