@@ -65,12 +65,14 @@ def login(lguser,lgpass):
             else:
                 break
         else:
+            if (re.search('id="page-site-index"', browser.page_source) or  re.search('class="usertext"', browser.page_source)):
+                print ("OR ready loged in")
+                break
             time.sleep(2)
     time.sleep(3)
     check_loop=0
     while( check_loop<70):
         if (re.search('id="page-site-index"', browser.page_source) or  re.search('class="usertext"', browser.page_source)):
-            print ("Login found")
             break
         else:
             time.sleep(2)
