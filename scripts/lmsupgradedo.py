@@ -15,6 +15,7 @@ opt_nocontinue = True
 opt_notoclose = True
 opt_rnodiff = True
 opt_medldiff = True
+opt_vercheck = True
 #options
 options, remainder = getopt.getopt(sys.argv[1:], 'ho:v', ['help',
                                                          'h',
@@ -23,7 +24,8 @@ options, remainder = getopt.getopt(sys.argv[1:], 'ho:v', ['help',
                                                          'nocontinue',
                                                          'notoclose',
                                                          'noreportdiff',
-                                                         'nomeldcheck'
+                                                         'nomeldcheck',
+                                                         'novercheck'
                                                          ])
 for opt, arg in options:
     if opt in ('-h', '--help'):
@@ -34,12 +36,17 @@ for opt, arg in options:
         print ("** --noreportdiff: to disable report checking only")
         print ("** --nomeldcheck: to disable using medl to maualy compare reports if different")
         print ("* Other")
+        print ("** --novercheck: Wont ask you to check version")
         print ("** --nocronwait: to disable cronwating (!!for testing only!!)")
         print ("** --nocontinue: to disable auto clicking on continue buttions")
         print ("** --notoclose: Wont close Browser when done")
+
         print ("------------------------------------------------------")
         quit()
     else:
+
+        if opt in ('--novercheck'):
+            opt_vercheck = False
         if opt in ('--noreportcheck'):
             opt_rcheck = False
         if opt in ('--noreportdiff'):
@@ -135,10 +142,6 @@ if (opt_cronwait == True):
                 print ("30 seconds left")
                 time.sleep(30)
                 crondisable = False
-
-
-
-
 else:
     print ("Cronwait disabled")
     if (opt_rcheck == True):
@@ -164,13 +167,13 @@ try:
         print ("Upgrade key: Found -> " + data['lmsettings']['config']['upgradekey'] +" <-" )
         repans = input("Press enter when upgrade the files on server")
         totara.upgrade_upgradekey(url,data['lmsettings']['config']['upgradekey'])
-
 except KeyError:
     print ("no LMS upgradkey retrived")
     repans = input("Press enter when upgrade the files on server")
+
 ##After
 print ("Approving upgrade request")
-totara.upgrade_confirm()
+totara.upgrade_confirm(opt_vercheck)
 print ("-->Running checks")
 res = totara.check_envextra("nourl")
 if (res['finalcheck'] == True):
@@ -194,13 +197,18 @@ if (res['finalcheck'] == True):
             print ("Time out happend (know to happen to upgrade taking longer)")
             if (totara.upgrade_witing() is True):
                 print ("--->Compleated")
-                repans = input("Press enter to move to the next stage")
             else:
                 print ("Somtihng went wrong")
         else:
             if (totara.upgrade_witing() is True):
                 print ("-->Upgrade Compleated")
-                repans = input("Press enter to move to the next stage")
+                if (opt_nocontinue is True):
+                    if (totara.update_carryon("Continue","800") is False):
+                        print ("Somthing happend possable Upgarde taken longer then planed")
+                        repans = input("When the Continue is shown Click on it and press next")
+                        print ("ok carrying on")
+                else:
+                    print ("press the Contuniue buttion")
             else:
                 print ("Somtihng went wrong")
     else:
@@ -208,10 +216,18 @@ if (res['finalcheck'] == True):
 else:
     print("--->looks to be an issue with plugin checks")
     repans = input("Press enter to move to the next stage")
+
+###Hoping to be at this stage
 ##Found that may need to reloagin
+
 print ("Check and disable/enable or change settings required")
+
+
+#some times you done auto out need to check this one
 totara.login(decryt(data['lmsserver_user']),decryt(data['lmsserver_pass']))
 time.sleep(5)
+
+
 ##Get new version number
 versplit = totara.check_version(url)
 print ("Updating Version number")
@@ -221,6 +237,10 @@ if (versplit['error'] == False):
     print ("--> Version: " + ver_major + "." + ver_minor)
 else:
     sys.exit(versplit['errormsg'])
+
+
+##Getting Report data and compare stage
+
 #pull down reports
 if (opt_rcheck == True):
     print("Getting reports -> after upgrade")
@@ -231,6 +251,7 @@ if (opt_rcheck == True):
     time.sleep(10)
 else:
     print("Reporting Grathing Disabled")
+#Checks the reports
 if (opt_rcheck == True and opt_rnodiff == True):
     print("Compaing reports before and after upgrade")
     for reportname in os.listdir(lmsrports['old']):

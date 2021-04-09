@@ -81,13 +81,17 @@ def login(lguser,lgpass):
 
 #Upgrade
 ##Confirm Upgrade
-def upgrade_confirm():
+def upgrade_confirm(autopass):
     try:
         w = WebDriverWait(browser, 120)
         w.until(EC.title_contains('Administration'))
         w.until(EC.visibility_of_element_located((By.XPATH, "//*[@class='buttons']")))
-        print ("Make sure the version is correct and Press the Continue buttion")
-        w = WebDriverWait(browser, 180)
+        if (autopass == True):
+            print ("Make sure the version is correct and Press the Continue buttion")
+        else:
+            print ("Bypasing Manualy Version check")
+            browser.find_element_by_xpath('//*[@type="submit" and @value="Continue"]').click()
+        w = WebDriverWait(browser, 200)
         w.until(EC.title_contains('Current release information'))
         return True
     except TimeoutException:
