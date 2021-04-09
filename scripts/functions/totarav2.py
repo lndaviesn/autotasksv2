@@ -70,7 +70,6 @@ def login(lguser,lgpass):
             if (re.search('id="page-site-index"', browser.page_source) or  re.search('class="usertext"', browser.page_source)):
                 print ("OR ready loged in")
                 break
-            print ("wating for page to load")
             time.sleep(2)
     check_loop=0
     while( check_loop<70):
@@ -78,6 +77,7 @@ def login(lguser,lgpass):
             break
         else:
             time.sleep(2)
+            check_loop = check_loop + 1
 
 #Upgrade
 ##Confirm Upgrade
