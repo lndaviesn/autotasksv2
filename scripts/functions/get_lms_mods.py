@@ -47,7 +47,7 @@ def pull(lmsdata):
                     sys.exit("Somthing happend " + e)
 
 #need to pull from currentlms
-    if (os.path.exists(frompath) is True and modfound is False):
+    if (os.path.exists(frompath) is False and modfound is False):
         print ("!!alert this way may not pass all mods!!")
         print ("!!As script only checks theme and certs!!")
         #theme
