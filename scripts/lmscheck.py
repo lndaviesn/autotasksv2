@@ -102,6 +102,7 @@ if res['finalcheck'] == False:
 else:
     print("No issues found")
 
+#Make this the last check all ways
 print ("--Checking scheduled tasks--")
 if (croncheck() == True):
     print ("Scheduled tasks are running")
@@ -114,16 +115,19 @@ else:
     print ("60 Seconds left")
     time.sleep(30)
     print ("30 Seconds left")
-    time.sleep(30)
+    time.sleep(20)
+    print ("10 Seconds left")
+    time.sleep(5)
+    print ("5 Seconds left")
+    time.sleep(5)
+    print ("Re-testing now")
     if (croncheck() == True):
         print ("Scheduled tasks are running")
         testres = True
     else:
         testres = False
         totara.close()
-        sys.exit("!!Scheduled tasks check failed need to check!!")
-
-
+        sys.exit("!!Scheduled tasks check failed need to check manualy!!")
 
 if testres == True:
     totara.set_maintenancemode(url,'Disable')
