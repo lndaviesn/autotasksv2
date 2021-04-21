@@ -202,14 +202,15 @@ if os.path.exists(lmsdata["modspath"]):
     glfun.copyDirectory(lmsdata["modspath"], lmsdata["uplmsfolder"] + "/" + lmsdata["version_major"]+lmsdata["version_minor"] + "/mods")
 
 shutil.copy2(lmsdata["currentlmspath"] + "/config.php",lmsdata["uplmsfolder"] + "/config.php")
-persmods_folder ="for i in $(find . -type d'); do chmod 0755 \"$i\" > /dev/null; done"
-os.system(persmods_folder)
-persmods_file ="for i in $(find . -type f); do chmod 0644 \"$i\" > /dev/null; done"
-os.system(persmods_file)
-
-
+print ("Sorting out permishions")
+for root, dirs, files in os.walk(lmsfodpath, topdown=False):
+    for dir in [os.path.join(root,d) for d in dirs]:
+        os.chmod(dir, 0o777)
+    for file in [os.path.join(root, f) for f in files]:
+        os.chmod(file, 0o644)
 os.system(zipcmd)
-shutil.copyfile(zipname,lmsdata["uplmsfolder"] + "/" + lmsdata["version_major"]+lmsdata["version_minor"]+"/"+zipname)
+#shutil.make_archive(lmsfodname, 'zip', lmsdata["tmpfolder"]+"/"+lmsfodname, lmsdata["tmpfolder"])
+#shutil.copyfile(zipname,lmsdata["uplmsfolder"] + "/" + lmsdata["version_major"]+lmsdata["version_minor"]+"/"+zipname)
 
 #Empty tmp folder (adding so dont forget)
 shutil.rmtree(lmsdata["tmpfolder"])
