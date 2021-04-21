@@ -78,15 +78,11 @@ def pull(lmsdata):
                     shutil.copyfile(current_file,mod_file)
                     modfound = True
                     filediff = True
-            if (filediff == False):
-                print ("No files in theme are modified")
-                modfound = True
 
         print("--Getting Certificate--")
         current_path = lmsdata["currentlmspath"] + '/mod/certificate/type/'
         newlms_path = lmsdata["newlmspath"] + '/mod/certificate/type/'
         mod_path = topath + '/mod/certificate/type/'
-        print (mod_path, newlms_path, current_path)
         if os.path.exists(newlms_path):
             #we shall store all the file names in this list
             filelist = []
@@ -107,6 +103,11 @@ def pull(lmsdata):
                     os.makedirs(os.path.dirname(mod_file), exist_ok=True)
                     shutil.copyfile(current_file,mod_file)
                     filediff = True
+
+            if (filediff == False):
+                print ("No files in Certificates are modified")
+                modfound = True
+
         if (os.path.exists(mod_path)):
             glfun.copyDirectory(topath, frompath+"-pulldlms")
         else:
