@@ -114,15 +114,10 @@ for i in data['plugins']:
     elif plugindata["pluginupgarde"] == "true":
         lmsplugins.get(plugindata, lmsdata)
 
-##Get mods (if any)
-print ("Getting Mods")
-lmsmods.pull(lmsdata)
-
 ##Get the core LMS
 repotag = "totara-"+ lmsdata["version"]
 repofolder = lmsdata["newlmspath"]
 zippath=lmsdata["lmslocalstore"]+"/"+ repotag +".zip"
-
 ##Get the core LMS
 print ("Getting Core LMS files")
 if (int(lmsdata["version_major"]) <= 12):
@@ -152,6 +147,10 @@ if (int(lmsdata["version_major"]) == 13):
         base = "totara-"+ lmsdata["version"]
         getlms.get_git(giturl,base,lmsdata["tmpfolder"])
         os.rename(lmsdata["tmpfolder"]+"/totara-"+str(lmsdata["version"]),lmsdata["tmpfolder"]+"/newlms")
+
+##Get mods (if any)
+print ("Getting Mods")
+lmsmods.pull(lmsdata)
 
 
 
