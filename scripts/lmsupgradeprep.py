@@ -165,9 +165,6 @@ lmsfodname = "totara-" + lmsdata["version_major"] + lmsdata["version_minor"]+"-"
 lmsfodpath = lmsdata["tmpfolder"] + "/" + lmsfodname
 zipname = lmsfodname + ".zip"
 os.chdir(lmsdata["tmpfolder"])
-zipcmd = 'zip -qr ' + zipname + ' ' + lmsfodname
-
-
 
 #Create zip file of corelms
 print("Applying LMS core")
@@ -208,9 +205,17 @@ for root, dirs, files in os.walk(lmsfodpath, topdown=False):
         os.chmod(dir, 0o777)
     for file in [os.path.join(root, f) for f in files]:
         os.chmod(file, 0o644)
-os.system(zipcmd)
-#shutil.make_archive(lmsfodname, 'zip', lmsdata["tmpfolder"]+"/"+lmsfodname, lmsdata["tmpfolder"])
-#shutil.copyfile(zipname,lmsdata["uplmsfolder"] + "/" + lmsdata["version_major"]+lmsdata["version_minor"]+"/"+zipname)
+source = lmsdata["tmpfolder"]+"/"+lmsfodname
+destination = lmsdata["tmpfolder"]+"/"+zipname
+base = os.path.basename(destination)
+name = base.split('.')[0]
+format = base.split('.')[1]
+archive_from = os.path.dirname(source)
+archive_to = os.path.basename(source.strip(os.sep))
+shutil.make_archive(name, format, archive_from, archive_to)
+shutil.move('%s.%s'%(name,format), destination)
+
+shutil.copyfile(zipname,lmsdata["uplmsfolder"] + "/" + lmsdata["version_major"]+lmsdata["version_minor"]+"/"+zipname)
 
 #Empty tmp folder (adding so dont forget)
 shutil.rmtree(lmsdata["tmpfolder"])
