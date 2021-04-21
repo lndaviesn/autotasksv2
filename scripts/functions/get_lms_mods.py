@@ -50,42 +50,67 @@ def pull(lmsdata):
     if (os.path.exists(frompath) is False and modfound is False):
         print ("!!alert this way may not pass all mods!!")
         print ("!!As script only checks theme and certs!!")
-        #theme
+        print("--Getting Theme--")
         current_path = lmsdata["currentlmspath"] + '/theme/lnroots/'
         plugin_path = lmsdata["pluginspath"] + '/theme/lnroots/'
         mod_path = topath + '/theme/lnroots/'
         if os.path.exists(plugin_path):
             #we shall store all the file names in this list
             filelist = []
+            filediff = False
             for root, dirs, files in os.walk(current_path):
             	for file in files:
                     #append the file name to the list
             		filelist.append(os.path.join(root,file))
-            #print all the file names
             for name in filelist:
                 current_file = name
                 plugin_file = name.replace("currentlms", "plugins")
                 mod_file = name.replace(current_path, mod_path)
-
                 if (os.path.exists(plugin_file) is False):
                     print ("File missing: "+ mod_file)
                     os.makedirs(os.path.dirname(mod_file), exist_ok=True)
                     shutil.copyfile(current_file,mod_file)
                     modfound = True
+                    filediff = True
                 elif ( glfun.gethash(current_file) != glfun.gethash(plugin_file)):
                     print ("File modifed: "+ mod_file)
                     os.makedirs(os.path.dirname(mod_file), exist_ok=True)
                     shutil.copyfile(current_file,mod_file)
                     modfound = True
-        #certs
+                    filediff = True
+            if (filediff == False):
+                print ("No files in theme are modified")
+                modfound = True
+
+        print("--Getting Certificate--")
         current_path = lmsdata["currentlmspath"] + '/mod/certificate/type/'
-        plugin_path = lmsdata["pluginspath"] + '/mod/certificate/type/'
+        newlms_path = lmsdata["newlmspath"] + '/mod/certificate/type/'
         mod_path = topath + '/mod/certificate/type/'
-
-        glfun.copyDirectory(current_path, mod_path)
-
-        #need top copy to frompath with extras
-        glfun.copyDirectory(topath, frompath+"-pulldlms")
+        print (mod_path, newlms_path, current_path)
+        if os.path.exists(newlms_path):
+            #we shall store all the file names in this list
+            filelist = []
+            filediff = False
+            for root, dirs, files in os.walk(current_path):
+                for file in files:
+                    #append the file name to the list
+                    filelist.append(os.path.join(root,file))
+            for name in filelist:
+                current_cert = name
+                new_cert = name.replace("currentlms", "newlms")
+                mod_file = name.replace(current_path, mod_path)
+                if (os.path.exists(new_cert) is False):
+                    os.makedirs(os.path.dirname(mod_file), exist_ok=True)
+                    shutil.copyfile(current_file,mod_file)
+                    filediff = True
+                elif ( glfun.gethash(current_cert) != glfun.gethash(new_cert)):
+                    os.makedirs(os.path.dirname(mod_file), exist_ok=True)
+                    shutil.copyfile(current_file,mod_file)
+                    filediff = True
+        if (os.path.exists(mod_path)):
+            glfun.copyDirectory(topath, frompath+"-pulldlms")
+        else:
+            print ("No mods found")
 
     if (modfound is False):
-        print ("No mods found from any resource")
+        print ("No mods found from any resource OR the site has none")
