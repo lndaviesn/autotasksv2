@@ -5,7 +5,7 @@ import cryptography
 from cryptography.fernet import Fernet
 import os, shutil, sys, glob, tempfile, json
 from os.path import basename
-import time
+import time, re
 import functions.gpg as gpg
 
 spath = os.getcwd()
@@ -78,20 +78,17 @@ if res['counts']['err'] > 0:
     for isse in res['issues_n']:
         print (isse)
     sys.exit("!!These need to be looked in to before carrying on!!")
-else:
-    if res['counts']['warn'] > 2:
-        print("Some LMS security Warining have been found")
-        testres = False
-        for isse in res['issues_n']:
+
+if res['counts']['warn'] > 0:
+    print("Some LMS security Warining have been found")
+    testres = False
+    for isse in res['issues_n']:
+        if (re.search('Writable config.php', isse)):
+            print ("!! Check Warning: " + str(isse) +" Needs to be readonly !!")
+            print ("Will check after Cron enabled")
+            testres = False
+        else:
             print (isse)
-    else:
-        print ("--Checks reported--")
-        print (str(res['counts']['ok']) + " checks as ok")
-        print (str(res['counts']['warn']) + " checks as warnings")
-        print (str(res['counts']['err']) + " checks as erros")
-        if (res['counts']['warn'] > 0 or res['counts']['err'] > 0):
-            for isse in res['issues_n']:
-                print (isse)
 
 res = totara.check_envextra(url)
 print ("--Checking server requirments--")
@@ -121,13 +118,32 @@ else:
     print ("5 Seconds left")
     time.sleep(5)
     print ("Re-testing now")
+
     if (croncheck() == True):
         print ("Scheduled tasks are running")
-        testres = True
+        time.sleep(2)
+        #dont trust this checking again
+        if (croncheck() == True):
+            testres = True
+        else:
+            testres = False
+            totara.close()
+            sys.exit("!!Scheduled tasks check failed need to check manualy!!")
     else:
         testres = False
         totara.close()
         sys.exit("!!Scheduled tasks check failed need to check manualy!!")
+
+res = totara.check_security(url)
+print ("--Checking config.php is Readonly --")
+if res['counts']['warn'] > 0:
+    for isse in res['issues_n']:
+        if (re.search('config.php', isse)):
+            if (re.search('Writable config.php', isse)):
+                sys.exit ("!!Config.php is Writable \n need to set as readonly and try again!!")
+                testres = False
+            else:
+                print ("Config.php is readonly")
 
 if testres == True:
     totara.set_maintenancemode(url,'Disable')
