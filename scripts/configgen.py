@@ -1,12 +1,19 @@
 #!/usr/bin/env python
-import os, shutil, sys, base64, cryptography, json
+import os, shutil, sys, base64, cryptography, json, re
 import tkinter as tk
 from cryptography.fernet import Fernet
 import functions.gpg as gpg
 
+def decryt(encval):
+    enctxt = encval.encode()
+    decrypted = encryption_type.decrypt(enctxt)
+    decrypted = decrypted.decode()
+    return decrypted
+
+
 myjson = {}
 arrplugins = []
-
+spath = os.getcwd()
 #functions
 def addplug():
     tmpmyjson = {}
@@ -17,8 +24,6 @@ def addplug():
     txt_lms_plugin_name.delete(0, tk.END)
     txt_lms_plugin_ver.delete(0, tk.END)
     Lb1.insert(tk.END,tmpmyjson["pluginname"] + " - " + tmpmyjson["pluginversion"])
-
-
 
 
 def supg():
@@ -42,9 +47,11 @@ def supg():
     jsonkey = key.decode("utf-8")
     myjsonsecurekey = gpg.enc(jsonkey)
     myjson["securekey"] = myjsonsecurekey
-
     try:
-        os.mkdir(txt_lms_domain.get())
+        if (re.search(txt_lms_domain.get(), os.getcwd())):
+            print ("Oready in folder")
+        else:
+            os.mkdir(txt_lms_domain.get())
     except OSError:
         print ("Creation of the directory failed" + txt_lms_domain.get())
     else:
@@ -64,7 +71,11 @@ def supg():
     else:
         print ("Successfully created the directory backup-lms")
 
-    configpath = txt_lms_domain.get() + "/" + "config.json"
+    if (re.search(txt_lms_domain.get(), os.getcwd())):
+        configpath = "config.json"
+    else:
+        configpath = txt_lms_domain.get() + "/" + "config.json"
+
     with open( configpath, 'w', encoding='utf-8') as f:
         json.dump(myjson, f, ensure_ascii=False, indent=4)
 
@@ -91,8 +102,6 @@ lb_lms_domain = tk.Label(host_frame, text='LMS Domain:')
 lb_lms_domain.grid(row=1, column=0)
 txt_lms_domain = tk.Entry(host_frame)
 txt_lms_domain.grid(row=1, column=1)
-
-
 
 lb_lms_cversion = tk.Label(host_frame, text='LMS Current Version:')
 lb_lms_cversion.grid(row=2, column=0)
@@ -133,11 +142,39 @@ tk.Button(plugins_frame, text="Add", command=addplug, state='normal').grid(colum
 
 Lb1 = tk.Listbox(plugins_frame, width=60)
 Lb1.grid(row=6, columnspan=6)
-
-
-
 tk.Button(butions_frame, text="Setup", command=supg, state='normal').grid(column=0, row=99)
 
 
 if __name__ == "__main__":
+#allows to update config info
+    if os.path.isfile(spath + '/upgrade.json'):
+        configpath = spath + '/upgrade.json'
+    if os.path.isfile(spath + '/config.json'):
+        configpath = spath + '/config.json'
+    if configpath !="":
+        f = open(configpath,)
+        data = json.load(f)
+        if 'lmsaddress' in data:
+            txt_lms_domain.insert(0, data['lmsaddress'])
+        if 'lmscurrentversion' in data:
+            txt_lms_cversion.insert(0, data['lmscurrentversion'])
+        if 'lmsupgardeversion' in data:
+            txt_lms_nversion.insert(0, data['lmsupgardeversion'])
+        if 'lmsserver_address' in data:
+            txt_server_addr.insert(0, data['lmsserver_address'])
+        if 'plugins' in data:
+            for plugindata in data['plugins']:
+                txt_lms_plugin_name.insert(0, plugindata['pluginname'])
+                txt_lms_plugin_ver.insert(0, plugindata['pluginversion'])
+                addplug()
+        if 'securekey' in data:
+            if data['securekey'] != "":
+                key = gpg.dec(data['securekey'])
+                encryption_type = Fernet(key)
+                dec_username = decryt(data['lmsserver_user'])
+                txt_lms_user.insert(0, dec_username)
+                dec_password = decryt(data['lmsserver_pass'])
+                txt_lms_pass.insert(0, dec_password)
+
+#starts the form up
     root.mainloop()
