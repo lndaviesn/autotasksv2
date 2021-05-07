@@ -13,6 +13,7 @@ import re, string, random, mmap, os, time, datetime, pytz
 ##Loads the webpage
 def webb(addr,min):
     global browser
+    options = webdriver.FirefoxOptions()
     profile = webdriver.FirefoxProfile()
     profile.set_preference("browser.download.folderList", 2)
     profile.set_preference("browser.download.manager.showWhenStarting", False)
