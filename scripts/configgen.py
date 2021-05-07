@@ -175,6 +175,5 @@ if __name__ == "__main__":
                 txt_lms_user.insert(0, dec_username)
                 dec_password = decryt(data['lmsserver_pass'])
                 txt_lms_pass.insert(0, dec_password)
-
 #starts the form up
     root.mainloop()
