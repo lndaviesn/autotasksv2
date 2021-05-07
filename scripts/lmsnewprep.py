@@ -16,6 +16,7 @@ lmsdata["uplmsfolder"] = spath + "/new-lms/"
 lmsdata["lmslocalstore"] = corelms.lmsrepor['localloc']
 glfun.createdir(lmsdata["uplmsfolder"])
 #added mode for config or upgarde.json file
+
 if os.path.isfile(spath + '/upgrade.json'):
     configpath = spath + '/upgrade.json'
 
