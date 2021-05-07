@@ -37,7 +37,6 @@ def get(plugindata, lmsdata):
     for x in plugindb.new:
         if x['name'] == plugindata['pluginname'] and x['lmsversion'] == lmsdata['version_major']:
             if x['media'] == "curl":
-                print ("!!!will get from website - working on!!!")
                 print ("Found pulling from website")
                 filedump = lmsdata["tmpfolder"] + "/filedump/"
                 url = x['repo']
@@ -63,7 +62,6 @@ def get(plugindata, lmsdata):
 
             if x['media'] == "git":
                 #clone the repo to an gitdump folder and then copys to the pulgins folder
-                print ("!!!will get from git - working on!!!")
                 print ("Found pulling from git repo")
                 gitdump = lmsdata["tmpfolder"] + "/gitdump/"
                 repofolder = gitdump + "/" + x['path']

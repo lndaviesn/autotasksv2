@@ -9,6 +9,9 @@ lms_mods_store = modsdb.lms_mods_store_path
 
 #rebuild with mutple defs
 def pull(lmsdata):
+    if "mods_curpull" not in lmsdata:
+        lmsdata['mods_curpull'] = True
+
     testv = False
     modfound = False
     frompath = lms_mods_store + lmsdata['address']
@@ -47,7 +50,7 @@ def pull(lmsdata):
                     sys.exit("Somthing happend " + e)
 
 #need to pull from currentlms
-    if (os.path.exists(frompath) is False and modfound is False):
+    if (os.path.exists(frompath) is False and modfound is False and lmsdata['mods_curpull'] == True):
         print ("!!alert this way may not pass all mods!!")
         print ("!!As script only checks theme and certs!!")
         print("--Getting Theme--")
