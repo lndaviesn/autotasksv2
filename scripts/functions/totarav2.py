@@ -22,7 +22,6 @@ def webb(addr,min):
     profile.set_preference("browser.helperApps.alwaysAsk.force", False)
     profile.set_preference("browser.download.dir", "/tmp/")
     browser = webdriver.Firefox(firefox_profile=profile)
-    browser.implicitly_wait(20) # seconds
     browser.get(addr+"/?saml=off")
     if (min == True):
         browser.minimize_window()
@@ -427,7 +426,11 @@ def disable_content_market(lms_site,lms_version):
                 break
             else:
                 time.sleep(2)
-        browser.find_element_by_xpath('//*[@id="capabilitysearch"]').send_keys('totara/contentmarketplace:config')
+        capability_select = browser.find_element_by_xpath("//select[@id='id_capability']")
+        capability_select.find_element_by_xpath("//option[@value='totara/contentmarketplace:config']").click()
+        roles_select = browser.find_element_by_xpath("//select[@id='id_roles']")
+        roles_select.find_element_by_xpath("//option[@value='0']").click()
+
         browser.find_element_by_xpath('//*[@type="submit" and @value="Get the overview"]').click()
         table_id = browser.find_element_by_xpath('//*[@class="lastrow"]')
         row_len=len(table_id.find_elements_by_tag_name("td"))
