@@ -115,19 +115,28 @@ def upgrade_witing():
 
 ##enter upgradkey
 def upgrade_upgradekey(lms_site,upkey):
-    browser.get(lms_site+'/admin/index.php')
-    check_loop=0
-    while( check_loop<70):
-        if (re.search('<div class="upgradekeyreq">', browser.page_source)):
-            lg_upgardekey = browser.find_element_by_xpath('//*[@name="upgradekey" and @type="password"]')
-            lg_upgardekey.clear()
-            lg_upgardekey.send_keys(upkey)
-            time.sleep(2)
-            browser.find_element_by_xpath('//*[@type="submit" and @value="Submit"]').click()
-            break
-        else:
-            time.sleep(2)
-            check_loop = check_loop +1
+    upkeyc = False
+    waitcount=0
+    print ("Wating for upgarde page")
+    while upkeyc == False:
+        try:
+            print ("Try:" + str(waitcount))
+            browser.get(lms_site+'/admin/index.php')
+            w = WebDriverWait(browser, 5)
+            a_test = w.until(EC.visibility_of_element_located((By.XPATH, "//*[@class='upgradekeyreq']")))
+            if (a_test):
+                lg_upgardekey = browser.find_element_by_xpath('//*[@name="upgradekey" and @type="password"]')
+                lg_upgardekey.clear()
+                lg_upgardekey.send_keys(upkey)
+                time.sleep(2)
+                browser.find_element_by_xpath('//*[@type="submit" and @value="Submit"]').click()
+                upkeyc = True
+                break
+            else:
+                time.sleep(10)
+                waitcount = waitcount + 1
+        except TimeoutException:
+            waitcount = waitcount + 1
 
 def update_carryon(btext,timeout):
     try:
