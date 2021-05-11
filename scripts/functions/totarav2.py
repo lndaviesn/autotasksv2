@@ -121,6 +121,9 @@ def upgrade_upgradekey(lms_site,upkey):
     while upkeyc == False:
         try:
             print ("Try:" + str(waitcount))
+            if (waitcount > 200):
+                print ("Waited to long for upgardekey screen")
+                return
             browser.get(lms_site+'/admin/index.php')
             w = WebDriverWait(browser, 5)
             a_test = w.until(EC.visibility_of_element_located((By.XPATH, "//*[@class='upgradekeyreq']")))
