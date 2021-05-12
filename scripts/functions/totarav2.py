@@ -17,7 +17,6 @@ def webb(addr,min):
     profile = webdriver.FirefoxProfile()
     profile.set_preference("browser.download.folderList", 2)
     profile.set_preference("browser.download.manager.showWhenStarting", False)
-    profile.set_preference("browser.helperApps.neverAsk.saveToDisk","text/csv")
     profile.set_preference("browser.download.panel.shown", False)
     profile.set_preference("browser.helperApps.alwaysAsk.force", False)
     profile.set_preference("browser.download.dir", "/tmp/")
@@ -33,7 +32,6 @@ def maxerr():
 
 ##Close the LMS window
 def close():
-    time.sleep(10)
     browser.quit()
 
 ##logins
@@ -42,7 +40,10 @@ def login(lguser,lgpass):
     loginckh=False
     while( check_loop<70):
         if (re.search('id="page-login-index"', browser.page_source)):
-            #check if their is any lick to login page links
+            try:
+                browser.find_element_by_xpath('//*[@id="showlogin"]').click()
+            except Exception as e:
+                loginckh = False
             try:
                 browser.find_element_by_xpath('//*[@class="showLogin"]').click()
             except Exception as e:
@@ -122,12 +123,13 @@ def upgrade_upgradekey(lms_site,upkey):
         try:
             print ("Try:" + str(waitcount))
             if (waitcount > 200):
-                print ("Waited to long for upgardekey screen")
+                sys.exit ("Waited to long for upgardekey screen")
                 return
             browser.get(lms_site+'/admin/index.php')
             w = WebDriverWait(browser, 5)
             a_test = w.until(EC.visibility_of_element_located((By.XPATH, "//*[@class='upgradekeyreq']")))
             if (a_test):
+                print ("Found Page")
                 lg_upgardekey = browser.find_element_by_xpath('//*[@name="upgradekey" and @type="password"]')
                 lg_upgardekey.clear()
                 lg_upgardekey.send_keys(upkey)
