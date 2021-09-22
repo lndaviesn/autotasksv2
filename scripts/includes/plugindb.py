@@ -48,7 +48,7 @@ new=[
 {"name":"qtype_riskyesnona","media":"git","repo":"ssh://git@github.com/LearningNexus/qtype_riskyesnona.git","branch":"2016120500","lmsversion":"10","path":"question/type"},
 {"name":"qtype_riskyesnona","media":"git","repo":"ssh://git@github.com/LearningNexus/qtype_riskyesnona.git","branch":"2016120500","lmsversion":"9","path":"question/type"},
 
-{"name":"qtype_riskyesno","media":"git","repo":"ssh://git@github.com/LearningNexus/qtype_riskyesno.git","branch":"2015051100","lmsversion":"12","path":"question/type"},
+{"name":"qtype_riskyesno","media":"git","repo":"ssh://git@github.com/LearningNexus/qtype_riskyesno.git","branch":"2016120500","lmsversion":"12","path":"question/type"},
 {"name":"qtype_riskyesno","media":"git","repo":"ssh://git@github.com/LearningNexus/qtype_riskyesno.git","branch":"2015051100","lmsversion":"11","path":"question/type"},
 {"name":"qtype_riskyesno","media":"git","repo":"ssh://git@github.com/LearningNexus/qtype_riskyesno.git","branch":"2015051100","lmsversion":"10","path":"question/type"},
 {"name":"qtype_riskyesno","media":"git","repo":"ssh://git@github.com/LearningNexus/qtype_riskyesno.git","branch":"2015051100","lmsversion":"9","path":"question/type"},
@@ -58,7 +58,7 @@ new=[
 {"name":"qtype_riskyesnano","media":"git","repo":"ssh://git@github.com/LearningNexus/qtype_riskyesnano.git","branch":"2016120500","lmsversion":"10","path":"question/type"},
 {"name":"qtype_riskyesnano","media":"git","repo":"ssh://git@github.com/LearningNexus/qtype_riskyesnano.git","branch":"2016120500","lmsversion":"9","path":"question/type"},
 
-{"name":"mod_riskassessment","media":"git","repo":"ssh://git@github.com/LearningNexus/mod_riskassessment.git","branch":"2017051500","lmsversion":"12","path":"mod/"},
+{"name":"mod_riskassessment","media":"git","repo":"ssh://git@github.com/LearningNexus/mod_riskassessment.git","branch":"2017051500.02","lmsversion":"12","path":"mod/"},
 {"name":"mod_riskassessment","media":"git","repo":"ssh://git@github.com/LearningNexus/mod_riskassessment.git","branch":"2016120501","lmsversion":"11","path":"mod/"},
 {"name":"mod_riskassessment","media":"git","repo":"ssh://git@github.com/LearningNexus/mod_riskassessment.git","branch":"2016120500","lmsversion":"10","path":"mod/"},
 {"name":"mod_riskassessment","media":"git","repo":"ssh://git@github.com/LearningNexus/mod_riskassessment.git","branch":"2015111602","lmsversion":"9","path":"mod/"},
@@ -69,7 +69,7 @@ new=[
 {"name":"local_totara_sync_helper_ftps","media":"git","repo":"ssh://git@github.com/LearningNexus/local_totara_sync_helper_ftps.git","branch":"2019031500","lmsversion":"9","path":"local/"},
 
 
-{"name":"local_totara_sync_helper","media":"git","repo":"ssh://git@github.com/LearningNexus/local_totara_sync_helper.git","branch":"2018112200","lmsversion":"12","path":"local/"},
+{"name":"local_totara_sync_helper","media":"git","repo":"ssh://git@github.com/LearningNexus/local_totara_sync_helper.git","branch":"2020120200","lmsversion":"12","path":"local/"},
 {"name":"local_totara_sync_helper","media":"git","repo":"ssh://git@github.com/LearningNexus/local_totara_sync_helper.git","branch":"2017091901","lmsversion":"11","path":"local/"},
 {"name":"local_totara_sync_helper","media":"git","repo":"ssh://git@github.com/LearningNexus/local_totara_sync_helper.git","branch":"2017091901","lmsversion":"10","path":"local/"},
 {"name":"local_totara_sync_helper","media":"git","repo":"ssh://git@github.com/LearningNexus/local_totara_sync_helpert.git","branch":"2017061600","lmsversion":"9","path":"local/"},
@@ -98,10 +98,15 @@ new=[
 {"name":"block_accessibility","media":"curl","repo":"https://moodle.org/plugins/download.php/14021/block_accessibility_moodle29_2015011600.zip","branch":"2015011600","lmsversion":"11","path":"block/"},
 {"name":"block_accessibility","media":"curl","repo":"https://moodle.org/plugins/download.php/14021/block_accessibility_moodle29_2015011600.zip","branch":"2015011600","lmsversion":"10","path":"block/"},
 {"name":"block_accessibility","media":"curl","repo":"https://moodle.org/plugins/download.php/8385/block_accessibility_moodle29_2015011600.zip","branch":"2015011600","lmsversion":"9","path":"block/"},
-{"name":"auth_oidc","media":"curl","repo":"https://moodle.org/plugins/download.php/23298/auth_oidc_moodle310_2020110900.zip","branch":"2020110900","lmsversion":"12","path":"auth/"},
-{"name":"auth_oidc","media":"curl","repo":"https://moodle.org/plugins/download.php/23298/auth_oidc_moodle310_2020110900.zip","branch":"2020110900","lmsversion":"11","path":"auth/"}
 
+{"name":"auth_oidc","media":"curl","repo":"https://moodle.org/plugins/download.php/23298/auth_oidc_moodle310_2020110900.zip","branch":"2020110900","lmsversion":"12","path":"auth/"},
+{"name":"auth_oidc","media":"curl","repo":"https://moodle.org/plugins/download.php/23298/auth_oidc_moodle310_2020110900.zip","branch":"2020110900","lmsversion":"11","path":"auth/"},
+
+{"name":"local_cwc_completion_export","media":"git","repo":"ssh://git@github.com/LearningNexus/local_cwc_completion_export.git","branch":"2020062400","lmsversion":"12","path":"local/"},
+{"name":"local_cwc_completion_export","media":"git","repo":"ssh://git@github.com/LearningNexus/local_cwc_completion_export.git","branch":"2020062400","lmsversion":"11","path":"local/"}
 ]
+
+
 
 
 #{"name":"","media":"git","repo":"","branch":"","lmsversion":"12","path":""},
